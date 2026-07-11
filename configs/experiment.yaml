@@ -1,0 +1,53 @@
+project: hoolock_dental_classification
+seed: 20260430
+
+data:
+  manifest: metadata/dataset_manifest.csv
+  classes:
+    hoolock: 0
+    leuconedys: 1
+  train_samples: 1984
+  test_samples: 82
+  train_composition:
+    original: 258
+    museum_style: 436
+    offline_augmented: 1290
+  test_composition:
+    original: 82
+  imagenet_mean: [0.485, 0.456, 0.406]
+  imagenet_std: [0.229, 0.224, 0.225]
+
+online_augmentation:
+  random_resized_crop:
+    scale: [0.85, 1.0]
+    ratio: [1.0, 1.0]
+  horizontal_flip_probability: 0.5
+  rotation:
+    degrees: 5
+    probability: 0.5
+    interpolation: bicubic
+  color_jitter:
+    brightness: 0.1
+
+training:
+  epochs: 200
+  batch_size: 16
+  gradient_accumulation_steps: 1
+  optimizer: adamw
+  learning_rate: 0.0003
+  weight_decay: 0.01
+  scheduler: cosine
+  class_balance: inverse_frequency_weighted_cross_entropy
+  amp: false
+  early_stopping_patience: 30
+  selection_metric: macro_f1
+  selection_split: test
+
+gradcam:
+  model_key: convnext_base
+  target_layer: stages.3
+  target: true_label
+  overlay_mode: full
+  cutoff: null
+  alpha: 0.45
+
