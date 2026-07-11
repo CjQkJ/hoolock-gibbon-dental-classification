@@ -130,6 +130,13 @@ python -m src.gradcam \
 
 Outputs are stored separately under `original/`, `heatmap/`, and `overlay/`, together with a `gradcam_manifest.csv` file.
 
+## Supplementary Grad-CAM Packages
+
+The complete reviewer packages are available from the [Grad-CAM Reviewer Materials release](https://github.com/CjQkJ/hoolock-gibbon-dental-classification/releases/tag/reviewer-materials-v1):
+
+- [English Grad-CAM package](https://github.com/CjQkJ/hoolock-gibbon-dental-classification/releases/download/reviewer-materials-v1/GradCAM_English.zip)
+- [Chinese Grad-CAM package with results](https://github.com/CjQkJ/hoolock-gibbon-dental-classification/releases/download/reviewer-materials-v1/GradCAM_Chinese_with_results.zip)
+
 ## Tests
 
 ```bash

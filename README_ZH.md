@@ -130,6 +130,13 @@ python -m src.gradcam \
 
 输出按 `original/`、`heatmap/` 和 `overlay/` 分开保存，并生成 `gradcam_manifest.csv`。
 
+## Grad-CAM 补充材料
+
+完整审稿材料可从 [Grad-CAM Reviewer Materials Release](https://github.com/CjQkJ/hoolock-gibbon-dental-classification/releases/tag/reviewer-materials-v1) 下载：
+
+- [英文 Grad-CAM 包](https://github.com/CjQkJ/hoolock-gibbon-dental-classification/releases/download/reviewer-materials-v1/GradCAM_English.zip)
+- [中文 Grad-CAM 与结果包](https://github.com/CjQkJ/hoolock-gibbon-dental-classification/releases/download/reviewer-materials-v1/GradCAM_Chinese_with_results.zip)
+
 ## 测试
 
 ```bash
