@@ -37,7 +37,7 @@
 
 原实验没有单独验证集。测试集同时用于逐 epoch 早停、最佳 checkpoint 选择和最终指标报告。因此结果是“测试集参与模型选择”的实验结果，可能比完全独立测试评估乐观。发布代码忠实保留这一流程，并在 `selection_split: test` 中显式记录。
 
-测试推理保持干净和确定：每张图一个视图、一次前向、无 TTA、无校准、无阈值调参、无集成，决策规则为简单 `argmax`。
+测试推理为确定性流程：每张图一个视图、一次前向、无 TTA、无校准、无阈值调参、无集成，决策规则为 `argmax`。
 
 ## 文件结构
 
@@ -99,7 +99,7 @@ python scripts/offline_augmentation.py \
 
 历史正式数据生成时没有保存离线增强的随机数状态；发布脚本增加了显式 seed 以保证后续运行可复现。论文使用的确切增强文件由发布 manifest 固定。
 
-436 张博物馆风格化图像是预先生成并随正式数据集管理的固定输入，不在训练时生成。当前工程中没有保存其原始风格化生成模型，因此本包复现的是以发布版 `dataset_augmented` 为输入的完整训练流程。
+436 张博物馆风格化图像是预先生成并随正式数据集管理的固定输入，不在训练时生成。当前项目中没有保存其原始风格化生成模型，因此本包复现的是以发布版 `dataset_augmented` 为输入的完整训练流程。
 
 ## 训练
 
@@ -164,7 +164,7 @@ python -m src.gradcam \
 
 ## Release 材料
 
-Grad-CAM 审稿材料通过 GitHub Releases 发布。较早的 `reviewer-materials-v1` 标签发布于 SAM31 协议更新之前，不代表当前 main 分支；分享 Grad-CAM 材料时应使用本次 SAM31 更新之后发布的 release。
+Grad-CAM 审稿材料通过 GitHub Releases 发布。`reviewer-materials-v1` 标签发布于 SAM31 协议更新之前，不代表当前 main 分支；分发 SAM31 协议的 Grad-CAM 材料时应使用本次更新之后发布的 release。
 
 ## 测试
 

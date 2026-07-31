@@ -118,7 +118,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--num-workers", type=int, default=4)
     parser.add_argument("--device", default="cuda")
     parser.add_argument("--data-parallel", action="store_true")
-    parser.add_argument("--no-pretrained", action="store_true", help="Do not download pretrained weights; useful for structure smoke tests.")
+    parser.add_argument("--no-pretrained", action="store_true", help="Do not download pretrained weights; useful for structural validation.")
     parser.add_argument("--dry-run", action="store_true")
     return parser.parse_args()
 

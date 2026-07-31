@@ -1,6 +1,6 @@
 # Hoolock Dental-Image Classification: Reproducibility Code for the Manuscript
 
-This repository is the standalone code package prepared for manuscript review. It covers dataset-manifest validation, offline augmentation, training and evaluation of 31 models under the frozen SAM31 protocol, result aggregation, and ConvNeXt Grad-CAM analysis. The reviewer-facing code does not depend on the original server paths; dataset, manifest, and model-weight locations are supplied through command-line arguments.
+This repository is the standalone code package prepared for manuscript review. It covers dataset-manifest validation, offline augmentation, training and evaluation of 31 models under the frozen SAM31 protocol, result aggregation, and ConvNeXt Grad-CAM analysis. The released code does not depend on the original server paths; dataset, manifest, and model-weight locations are supplied through command-line arguments.
 
 For the Chinese documentation, see [README_ZH.md](README_ZH.md).
 
@@ -37,7 +37,7 @@ The logical batch size is 16. The default physical micro-batch size is 16. The a
 
 The original experiment did not use a separate validation set. The test set was evaluated after every epoch and was used for early stopping, best-checkpoint selection, and final metric reporting. The reported results therefore reflect a protocol in which the test set participated in model selection and may be optimistic relative to evaluation on a fully independent test set. The release code faithfully preserves this procedure and records it explicitly as `selection_split: test`.
 
-Test inference is kept clean and deterministic: one view per image, one forward pass, no TTA, no calibration, no threshold tuning, no ensembling, and a simple `argmax` decision rule.
+Test inference is deterministic: one view per image, one forward pass, no TTA, no calibration, no threshold tuning, no ensembling, and an `argmax` decision rule.
 
 ## Directory Structure
 
@@ -164,7 +164,7 @@ Outputs are stored separately under `original/`, `heatmap/`, and `overlay/`, tog
 
 ## Release Assets
 
-Grad-CAM reviewer packages are distributed through GitHub Releases. The earlier `reviewer-materials-v1` tag was published before the SAM31 protocol update and does not correspond to the current main branch; use a release published after this SAM31 update when sharing Grad-CAM materials.
+Grad-CAM packages for reviewers are distributed through GitHub Releases. The `reviewer-materials-v1` tag was published before the SAM31 protocol update and does not correspond to the current main branch; Grad-CAM materials for the SAM31 protocol should be distributed under a release published after this update.
 
 ## Tests
 
