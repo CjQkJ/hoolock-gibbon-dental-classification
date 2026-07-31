@@ -5,14 +5,18 @@ from torchvision.transforms import InterpolationMode
 
 
 def build_transforms(image_size: int, mean: tuple[float, ...], std: tuple[float, ...]):
-    """返回正式实验使用的 safe 在线增强和测试预处理。"""
+    """Return the fixed SAM-31 online augmentation and clean test preprocessing.
+
+    The frozen e73b33b protocol uses a direct square resize during training,
+    not RandomResizedCrop. Test inference is deterministic: one resize, tensor
+    conversion, and normalization.
+    """
     train_transform = transforms.Compose(
         [
-            transforms.RandomResizedCrop(
-                image_size,
-                scale=(0.85, 1.0),
-                ratio=(1.0, 1.0),
-                interpolation=InterpolationMode.BICUBIC,
+            transforms.Resize(
+                (image_size, image_size),
+                interpolation=InterpolationMode.BILINEAR,
+                antialias=True,
             ),
             transforms.RandomHorizontalFlip(p=0.5),
             transforms.RandomApply(
@@ -31,10 +35,13 @@ def build_transforms(image_size: int, mean: tuple[float, ...], std: tuple[float,
     )
     test_transform = transforms.Compose(
         [
-            transforms.Resize((image_size, image_size)),
+            transforms.Resize(
+                (image_size, image_size),
+                interpolation=InterpolationMode.BILINEAR,
+                antialias=True,
+            ),
             transforms.ToTensor(),
             transforms.Normalize(mean=mean, std=std),
         ]
     )
     return train_transform, test_transform
-

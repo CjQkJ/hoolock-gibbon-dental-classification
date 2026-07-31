@@ -1,5 +1,6 @@
 project: hoolock_dental_classification
-seed: 20260430
+protocol_id: sam31_e73b33b_v1
+seed: 20260507
 
 data:
   manifest: metadata/dataset_manifest.csv
@@ -18,9 +19,8 @@ data:
   imagenet_std: [0.229, 0.224, 0.225]
 
 online_augmentation:
-  random_resized_crop:
-    scale: [0.85, 1.0]
-    ratio: [1.0, 1.0]
+  resize: direct_square
+  resize_interpolation: bilinear
   horizontal_flip_probability: 0.5
   rotation:
     degrees: 5
@@ -32,11 +32,17 @@ online_augmentation:
 training:
   epochs: 200
   batch_size: 16
+  logical_batch_size: 16
+  default_physical_microbatch: 16
   gradient_accumulation_steps: 1
   optimizer: adamw
   learning_rate: 0.0003
   weight_decay: 0.01
   scheduler: cosine
+  sam:
+    adaptive: false
+    rho: 0.05
+    norm_epsilon: 1.0e-12
   class_balance: inverse_frequency_weighted_cross_entropy
   amp: false
   early_stopping_patience: 30
@@ -50,4 +56,3 @@ gradcam:
   overlay_mode: full
   cutoff: null
   alpha: 0.45
-

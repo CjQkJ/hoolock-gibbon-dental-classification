@@ -1,0 +1,140 @@
+{
+  "schema_version": 1,
+  "protocol_id": "sam31_e73b33b_v1",
+  "canonical_candidate": {
+    "short_id": "e73b33b",
+    "commit": "e73b33bf888e26be4833d39d776107b665e08900",
+    "tag": "hoolock-final-e73b33b",
+    "model_id": "convnext_base.fb_in22k_ft_in1k",
+    "expected": {
+      "correct": 76,
+      "test_images": 82,
+      "accuracy": 0.926829268292683,
+      "balanced_accuracy": 0.9014550264550265,
+      "macro_f1": 0.915521978021978,
+      "best_epoch": 23,
+      "KIZ011338": "2/2",
+      "MCZ26474": "16/16"
+    }
+  },
+  "sources": {
+    "manuscript_models": "reviewer_code_release/configs/models_31.json",
+    "model_zoo": "configs/model_zoo_shortlist_50.json",
+    "weights_root": "/home/chenqingjian/four_test/Hoolock/model/shortlist_50_20260502"
+  },
+  "dataset": {
+    "root": "/home/chenqingjian/four_test/Hoolock/dataset_augmented",
+    "manifest": "metadata/supervised_hoolock_dataset_augmented_14_safe/split_manifest.csv",
+    "expected_train_images": 1984,
+    "expected_test_images": 82,
+    "expected_train_class_counts": {
+      "hoolock": 966,
+      "leuconedys": 1018
+    },
+    "expected_test_class_counts": {
+      "hoolock": 28,
+      "leuconedys": 54
+    },
+    "class_names": [
+      "hoolock",
+      "leuconedys"
+    ]
+  },
+  "training": {
+    "seed": 20260507,
+    "logical_batch_size": 16,
+    "default_physical_microbatch": 16,
+    "num_workers": 4,
+    "max_epochs": 200,
+    "early_stopping_patience": 30,
+    "selection_metric": "macro_f1",
+    "selection_stage": "test",
+    "amp": false,
+    "loss": {
+      "name": "inverse_frequency_weighted_cross_entropy"
+    },
+    "optimizer": {
+      "name": "AdamW",
+      "learning_rate": 0.0003,
+      "weight_decay": 0.01
+    },
+    "scheduler": {
+      "name": "CosineAnnealingLR",
+      "t_max": 200
+    },
+    "sam": {
+      "adaptive": false,
+      "rho": 0.05,
+      "norm_epsilon": 1e-12,
+      "global_norm": "l2_over_all_trainable_parameter_gradients",
+      "parameter_restoration": "exact_copy_and_torch_equal_assertion"
+    },
+    "augmentation": {
+      "resize": "direct_square",
+      "resize_interpolation": "bilinear",
+      "horizontal_flip_probability": 0.5,
+      "rotation_degrees": 5.0,
+      "rotation_probability": 0.5,
+      "rotation_interpolation": "bicubic",
+      "brightness": 0.1
+    }
+  },
+  "test_contract": {
+    "views_per_image": 1,
+    "forward_calls_per_batch": 1,
+    "tta": false,
+    "ensemble": false,
+    "calibration": false,
+    "decision_rule": "argmax",
+    "decision_threshold": null,
+    "metadata_postprocessing": false
+  },
+  "expected_screening_ids": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    12,
+    13,
+    14,
+    16,
+    17,
+    18,
+    19,
+    21,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    31,
+    35,
+    36,
+    37,
+    39,
+    41,
+    42
+  ],
+  "model_overrides": {
+    "9": {
+      "initial_physical_microbatch": 4,
+      "reason": "600-pixel input; retain logical batch 16"
+    },
+    "27": {
+      "freeze_backbone": true,
+      "initial_physical_microbatch": 4,
+      "reason": "documented MobileNetV5-300M memory exception"
+    },
+    "37": {
+      "initial_gpu_count": 2,
+      "reason": "existing model manifest recommends two GPUs"
+    }
+  }
+}

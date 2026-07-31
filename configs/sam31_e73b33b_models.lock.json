@@ -1,9 +1,13 @@
 {
+  "schema_version": 1,
+  "protocol_id": "sam31_e73b33b_v1",
+  "canonical_source_commit": "e73b33bf888e26be4833d39d776107b665e08900",
+  "weights_root": "/home/chenqingjian/four_test/Hoolock/model/shortlist_50_20260502",
+  "model_count": 31,
   "models": [
     {
-      "key": "rank_01",
       "screening_id": 1,
-      "rank": 1,
+      "key": "rank_01",
       "official_name": "ResNet-50",
       "model_id": "resnet50.a1_in1k",
       "parameters_m": 25.56,
@@ -18,19 +22,21 @@
         0.224,
         0.225
       ],
+      "resize_interpolation": "bilinear",
       "classifier_names": [
         "fc"
       ],
+      "weight_path": "/home/chenqingjian/four_test/Hoolock/model/shortlist_50_20260502/01_resnet50.a1_in1k/model.safetensors",
+      "weight_bytes": 102469840,
+      "weight_sha256": "3b087de126f1e40dc9c46bdfe1519eb322c3f3a98ca9b23fdfa85a963aebc4f0",
       "freeze_backbone": false,
       "initial_physical_microbatch": 16,
       "initial_gpu_count": 1,
-      "weight_relative_path": "01_resnet50.a1_in1k/model.safetensors",
-      "weight_sha256": "3b087de126f1e40dc9c46bdfe1519eb322c3f3a98ca9b23fdfa85a963aebc4f0"
+      "override_reason": null
     },
     {
-      "key": "rank_02",
       "screening_id": 2,
-      "rank": 2,
+      "key": "rank_02",
       "official_name": "DenseNet-121",
       "model_id": "densenet121.ra_in1k",
       "parameters_m": 7.98,
@@ -45,19 +51,21 @@
         0.224,
         0.225
       ],
+      "resize_interpolation": "bilinear",
       "classifier_names": [
         "classifier"
       ],
+      "weight_path": "/home/chenqingjian/four_test/Hoolock/model/shortlist_50_20260502/02_densenet121.ra_in1k/model.safetensors",
+      "weight_bytes": 32334434,
+      "weight_sha256": "eae900d8ae5b3716efa7f443fcc692aeb5a7f01f72581835c03c8c495f9eda10",
       "freeze_backbone": false,
       "initial_physical_microbatch": 16,
       "initial_gpu_count": 1,
-      "weight_relative_path": "02_densenet121.ra_in1k/model.safetensors",
-      "weight_sha256": "eae900d8ae5b3716efa7f443fcc692aeb5a7f01f72581835c03c8c495f9eda10"
+      "override_reason": null
     },
     {
-      "key": "rank_03",
       "screening_id": 3,
-      "rank": 3,
+      "key": "rank_03",
       "official_name": "RegNetY-16GF",
       "model_id": "regnety_160.sw_in12k_ft_in1k",
       "parameters_m": 83.59,
@@ -72,19 +80,21 @@
         0.224,
         0.225
       ],
+      "resize_interpolation": "bilinear",
       "classifier_names": [
         "head.fc"
       ],
+      "weight_path": "/home/chenqingjian/four_test/Hoolock/model/shortlist_50_20260502/03_regnety_160.sw_in12k_ft_in1k/model.safetensors",
+      "weight_bytes": 334892224,
+      "weight_sha256": "80da06ab029403fee128c573820b1f67477250709d302a3001a571eccdf613b9",
       "freeze_backbone": false,
       "initial_physical_microbatch": 16,
       "initial_gpu_count": 1,
-      "weight_relative_path": "03_regnety_160.sw_in12k_ft_in1k/model.safetensors",
-      "weight_sha256": "80da06ab029403fee128c573820b1f67477250709d302a3001a571eccdf613b9"
+      "override_reason": null
     },
     {
-      "key": "rank_04",
       "screening_id": 4,
-      "rank": 4,
+      "key": "rank_04",
       "official_name": "ResNeXt-101 32x8d",
       "model_id": "resnext101_32x8d.fb_wsl_ig1b_ft_in1k",
       "parameters_m": 88.79,
@@ -99,19 +109,21 @@
         0.224,
         0.225
       ],
+      "resize_interpolation": "bilinear",
       "classifier_names": [
         "fc"
       ],
+      "weight_path": "/home/chenqingjian/four_test/Hoolock/model/shortlist_50_20260502/04_resnext101_32x8d.fb_wsl_ig1b_ft_in1k/model.safetensors",
+      "weight_bytes": 356035250,
+      "weight_sha256": "8d77b419657693649173374c214893bbd13d0b45b3074c04f0b2abca1cb2584b",
       "freeze_backbone": false,
       "initial_physical_microbatch": 16,
       "initial_gpu_count": 1,
-      "weight_relative_path": "04_resnext101_32x8d.fb_wsl_ig1b_ft_in1k/model.safetensors",
-      "weight_sha256": "8d77b419657693649173374c214893bbd13d0b45b3074c04f0b2abca1cb2584b"
+      "override_reason": null
     },
     {
-      "key": "rank_05",
       "screening_id": 5,
-      "rank": 5,
+      "key": "rank_05",
       "official_name": "ResNeSt-50d",
       "model_id": "resnest50d.in1k",
       "parameters_m": 27.48,
@@ -126,19 +138,21 @@
         0.224,
         0.225
       ],
+      "resize_interpolation": "bilinear",
       "classifier_names": [
         "fc"
       ],
+      "weight_path": "/home/chenqingjian/four_test/Hoolock/model/shortlist_50_20260502/05_resnest50d.in1k/model.safetensors",
+      "weight_bytes": 110235808,
+      "weight_sha256": "974cbcb901945f63d1794dafcb569244f76d6ecfd42bb7255845c3b6e2f0de53",
       "freeze_backbone": false,
       "initial_physical_microbatch": 16,
       "initial_gpu_count": 1,
-      "weight_relative_path": "05_resnest50d.in1k/model.safetensors",
-      "weight_sha256": "974cbcb901945f63d1794dafcb569244f76d6ecfd42bb7255845c3b6e2f0de53"
+      "override_reason": null
     },
     {
-      "key": "rank_06",
       "screening_id": 6,
-      "rank": 6,
+      "key": "rank_06",
       "official_name": "EfficientNet-B0",
       "model_id": "efficientnet_b0.ra_in1k",
       "parameters_m": 5.29,
@@ -153,19 +167,21 @@
         0.224,
         0.225
       ],
+      "resize_interpolation": "bilinear",
       "classifier_names": [
         "classifier"
       ],
+      "weight_path": "/home/chenqingjian/four_test/Hoolock/model/shortlist_50_20260502/06_efficientnet_b0.ra_in1k/model.safetensors",
+      "weight_bytes": 21355344,
+      "weight_sha256": "d569899762ea9b1384ee07f4af64805cf8caa1c55f9253ebb1080dc40e87a2cd",
       "freeze_backbone": false,
       "initial_physical_microbatch": 16,
       "initial_gpu_count": 1,
-      "weight_relative_path": "06_efficientnet_b0.ra_in1k/model.safetensors",
-      "weight_sha256": "d569899762ea9b1384ee07f4af64805cf8caa1c55f9253ebb1080dc40e87a2cd"
+      "override_reason": null
     },
     {
-      "key": "efficientnet_b3",
       "screening_id": 7,
-      "rank": 7,
+      "key": "efficientnet_b3",
       "official_name": "EfficientNet-B3",
       "model_id": "efficientnet_b3.ra2_in1k",
       "parameters_m": 12.23,
@@ -180,19 +196,21 @@
         0.224,
         0.225
       ],
+      "resize_interpolation": "bilinear",
       "classifier_names": [
         "classifier"
       ],
+      "weight_path": "/home/chenqingjian/four_test/Hoolock/model/shortlist_50_20260502/07_efficientnet_b3.ra2_in1k/model.safetensors",
+      "weight_bytes": 49335454,
+      "weight_sha256": "279d2a53898aa89dab43fd6bd7df9f706aea4cb9cf916223988bbcb8e5850469",
       "freeze_backbone": false,
       "initial_physical_microbatch": 16,
       "initial_gpu_count": 1,
-      "weight_relative_path": "07_efficientnet_b3.ra2_in1k/model.safetensors",
-      "weight_sha256": "279d2a53898aa89dab43fd6bd7df9f706aea4cb9cf916223988bbcb8e5850469"
+      "override_reason": null
     },
     {
-      "key": "rank_08",
       "screening_id": 8,
-      "rank": 8,
+      "key": "rank_08",
       "official_name": "EfficientNet-B5",
       "model_id": "efficientnet_b5.sw_in12k_ft_in1k",
       "parameters_m": 30.39,
@@ -207,19 +225,21 @@
         0.224,
         0.225
       ],
+      "resize_interpolation": "bilinear",
       "classifier_names": [
         "classifier"
       ],
+      "weight_path": "/home/chenqingjian/four_test/Hoolock/model/shortlist_50_20260502/08_efficientnet_b5.sw_in12k_ft_in1k/model.safetensors",
+      "weight_bytes": 122330162,
+      "weight_sha256": "0e5c09ad618a28d977acf8b7846105443c553a4b425dddb54598a0ac6088aca7",
       "freeze_backbone": false,
       "initial_physical_microbatch": 16,
       "initial_gpu_count": 1,
-      "weight_relative_path": "08_efficientnet_b5.sw_in12k_ft_in1k/model.safetensors",
-      "weight_sha256": "0e5c09ad618a28d977acf8b7846105443c553a4b425dddb54598a0ac6088aca7"
+      "override_reason": null
     },
     {
-      "key": "rank_09",
       "screening_id": 9,
-      "rank": 9,
+      "key": "rank_09",
       "official_name": "EfficientNet-B7",
       "model_id": "tf_efficientnet_b7.ns_jft_in1k",
       "parameters_m": 66.35,
@@ -234,19 +254,21 @@
         0.224,
         0.225
       ],
+      "resize_interpolation": "bilinear",
       "classifier_names": [
         "classifier"
       ],
+      "weight_path": "/home/chenqingjian/four_test/Hoolock/model/shortlist_50_20260502/09_tf_efficientnet_b7.ns_jft_in1k/model.safetensors",
+      "weight_bytes": 266748382,
+      "weight_sha256": "96db100c1d3fe0c643b1bad065948a9169dcb99e013d668415084ca0e3ddebfe",
       "freeze_backbone": false,
       "initial_physical_microbatch": 4,
       "initial_gpu_count": 1,
-      "weight_relative_path": "09_tf_efficientnet_b7.ns_jft_in1k/model.safetensors",
-      "weight_sha256": "96db100c1d3fe0c643b1bad065948a9169dcb99e013d668415084ca0e3ddebfe"
+      "override_reason": "600-pixel input; retain logical batch 16"
     },
     {
-      "key": "rank_10",
       "screening_id": 10,
-      "rank": 10,
+      "key": "rank_10",
       "official_name": "EfficientNet-X-B5",
       "model_id": "efficientnet_x_b5.sw_r448_e450_in1k",
       "parameters_m": 33.44,
@@ -261,19 +283,21 @@
         0.224,
         0.225
       ],
+      "resize_interpolation": "bilinear",
       "classifier_names": [
         "classifier"
       ],
+      "weight_path": "/home/chenqingjian/four_test/Hoolock/model/shortlist_50_20260502/10_efficientnet_x_b5.sw_r448_e450_in1k/model.safetensors",
+      "weight_bytes": 134507856,
+      "weight_sha256": "57bb7c9be7e695bfed8983abc09e8c8906030bf4e9cf2d45c743df1aa719c280",
       "freeze_backbone": false,
       "initial_physical_microbatch": 16,
       "initial_gpu_count": 1,
-      "weight_relative_path": "10_efficientnet_x_b5.sw_r448_e450_in1k/model.safetensors",
-      "weight_sha256": "57bb7c9be7e695bfed8983abc09e8c8906030bf4e9cf2d45c743df1aa719c280"
+      "override_reason": null
     },
     {
-      "key": "rank_12",
       "screening_id": 12,
-      "rank": 12,
+      "key": "rank_12",
       "official_name": "EfficientNetV2-B3",
       "model_id": "tf_efficientnetv2_b3.in1k",
       "parameters_m": 14.36,
@@ -288,19 +312,21 @@
         0.224,
         0.225
       ],
+      "resize_interpolation": "bilinear",
       "classifier_names": [
         "classifier"
       ],
+      "weight_path": "/home/chenqingjian/four_test/Hoolock/model/shortlist_50_20260502/12_tf_efficientnetv2_b3.in1k/model.safetensors",
+      "weight_bytes": 57929264,
+      "weight_sha256": "11a35eee6184d9f296e331344fa2c03aa270f3472d28feb76fa35f0955a7b940",
       "freeze_backbone": false,
       "initial_physical_microbatch": 16,
       "initial_gpu_count": 1,
-      "weight_relative_path": "12_tf_efficientnetv2_b3.in1k/model.safetensors",
-      "weight_sha256": "11a35eee6184d9f296e331344fa2c03aa270f3472d28feb76fa35f0955a7b940"
+      "override_reason": null
     },
     {
-      "key": "rank_13",
       "screening_id": 13,
-      "rank": 13,
+      "key": "rank_13",
       "official_name": "EfficientNetV2-S",
       "model_id": "tf_efficientnetv2_s.in21k_ft_in1k",
       "parameters_m": 21.46,
@@ -315,19 +341,21 @@
         0.5,
         0.5
       ],
+      "resize_interpolation": "bilinear",
       "classifier_names": [
         "classifier"
       ],
+      "weight_path": "/home/chenqingjian/four_test/Hoolock/model/shortlist_50_20260502/13_tf_efficientnetv2_s.in21k_ft_in1k/model.safetensors",
+      "weight_bytes": 86523256,
+      "weight_sha256": "6f1933fb6c0d760eae03863ad0110570393e16c0610f8fe94dc9f978e52ec59c",
       "freeze_backbone": false,
       "initial_physical_microbatch": 16,
       "initial_gpu_count": 1,
-      "weight_relative_path": "13_tf_efficientnetv2_s.in21k_ft_in1k/model.safetensors",
-      "weight_sha256": "6f1933fb6c0d760eae03863ad0110570393e16c0610f8fe94dc9f978e52ec59c"
+      "override_reason": null
     },
     {
-      "key": "rank_14",
       "screening_id": 14,
-      "rank": 14,
+      "key": "rank_14",
       "official_name": "EfficientNetV2-L",
       "model_id": "tf_efficientnetv2_l.in21k_ft_in1k",
       "parameters_m": 118.52,
@@ -342,19 +370,21 @@
         0.5,
         0.5
       ],
+      "resize_interpolation": "bilinear",
       "classifier_names": [
         "classifier"
       ],
+      "weight_path": "/home/chenqingjian/four_test/Hoolock/model/shortlist_50_20260502/14_tf_efficientnetv2_l.in21k_ft_in1k/model.safetensors",
+      "weight_bytes": 476260560,
+      "weight_sha256": "e52f8ca1958ec63b4001232206824b9946d64e17ff9f941e2aa2bbd0df9d7e66",
       "freeze_backbone": false,
       "initial_physical_microbatch": 16,
       "initial_gpu_count": 1,
-      "weight_relative_path": "14_tf_efficientnetv2_l.in21k_ft_in1k/model.safetensors",
-      "weight_sha256": "e52f8ca1958ec63b4001232206824b9946d64e17ff9f941e2aa2bbd0df9d7e66"
+      "override_reason": null
     },
     {
-      "key": "rank_16",
       "screening_id": 16,
-      "rank": 16,
+      "key": "rank_16",
       "official_name": "EfficientViT-L3",
       "model_id": "efficientvit_l3.r384_in1k",
       "parameters_m": 246.04,
@@ -369,19 +399,21 @@
         0.224,
         0.225
       ],
+      "resize_interpolation": "bilinear",
       "classifier_names": [
         "head.classifier.4"
       ],
+      "weight_path": "/home/chenqingjian/four_test/Hoolock/model/shortlist_50_20260502/16_efficientvit_l3.r384_in1k/model.safetensors",
+      "weight_bytes": 984477832,
+      "weight_sha256": "6a8bb0164b1a8945baad45e1fc779bbf5e7d87ad5c91b7b3143a98ab62a23477",
       "freeze_backbone": false,
       "initial_physical_microbatch": 16,
       "initial_gpu_count": 1,
-      "weight_relative_path": "16_efficientvit_l3.r384_in1k/model.safetensors",
-      "weight_sha256": "6a8bb0164b1a8945baad45e1fc779bbf5e7d87ad5c91b7b3143a98ab62a23477"
+      "override_reason": null
     },
     {
-      "key": "rank_17",
       "screening_id": 17,
-      "rank": 17,
+      "key": "rank_17",
       "official_name": "ConvNeXt-Tiny",
       "model_id": "convnext_tiny.fb_in22k_ft_in1k",
       "parameters_m": 28.59,
@@ -396,19 +428,21 @@
         0.224,
         0.225
       ],
+      "resize_interpolation": "bilinear",
       "classifier_names": [
         "head.fc"
       ],
+      "weight_path": "/home/chenqingjian/four_test/Hoolock/model/shortlist_50_20260502/17_convnext_tiny.fb_in22k_ft_in1k/model.safetensors",
+      "weight_bytes": 114374272,
+      "weight_sha256": "77b619e187de71bce58721689da0c009e84cc20677293d7d43105307e34d868a",
       "freeze_backbone": false,
       "initial_physical_microbatch": 16,
       "initial_gpu_count": 1,
-      "weight_relative_path": "17_convnext_tiny.fb_in22k_ft_in1k/model.safetensors",
-      "weight_sha256": "77b619e187de71bce58721689da0c009e84cc20677293d7d43105307e34d868a"
+      "override_reason": null
     },
     {
-      "key": "convnext_base",
       "screening_id": 18,
-      "rank": 18,
+      "key": "convnext_base",
       "official_name": "ConvNeXt-Base",
       "model_id": "convnext_base.fb_in22k_ft_in1k",
       "parameters_m": 88.59,
@@ -423,19 +457,21 @@
         0.224,
         0.225
       ],
+      "resize_interpolation": "bilinear",
       "classifier_names": [
         "head.fc"
       ],
+      "weight_path": "/home/chenqingjian/four_test/Hoolock/model/shortlist_50_20260502/18_convnext_base.fb_in22k_ft_in1k/model.safetensors",
+      "weight_bytes": 354400320,
+      "weight_sha256": "4853efc8d5dd3ed9b0f888a9c601d7556373599f944f9ac79af8b8ec81aa7381",
       "freeze_backbone": false,
       "initial_physical_microbatch": 16,
       "initial_gpu_count": 1,
-      "weight_relative_path": "18_convnext_base.fb_in22k_ft_in1k/model.safetensors",
-      "weight_sha256": "4853efc8d5dd3ed9b0f888a9c601d7556373599f944f9ac79af8b8ec81aa7381"
+      "override_reason": null
     },
     {
-      "key": "rank_19",
       "screening_id": 19,
-      "rank": 19,
+      "key": "rank_19",
       "official_name": "ConvNeXtV2-Tiny",
       "model_id": "convnextv2_tiny.fcmae_ft_in22k_in1k",
       "parameters_m": 28.64,
@@ -450,19 +486,21 @@
         0.224,
         0.225
       ],
+      "resize_interpolation": "bilinear",
       "classifier_names": [
         "head.fc"
       ],
+      "weight_path": "/home/chenqingjian/four_test/Hoolock/model/shortlist_50_20260502/19_convnextv2_tiny.fcmae_ft_in22k_in1k/model.safetensors",
+      "weight_bytes": 114561694,
+      "weight_sha256": "6652fd90fc9c23977659e58515778e16fbbcd43f0b01fc693089cebe6d64c2a9",
       "freeze_backbone": false,
       "initial_physical_microbatch": 16,
       "initial_gpu_count": 1,
-      "weight_relative_path": "19_convnextv2_tiny.fcmae_ft_in22k_in1k/model.safetensors",
-      "weight_sha256": "6652fd90fc9c23977659e58515778e16fbbcd43f0b01fc693089cebe6d64c2a9"
+      "override_reason": null
     },
     {
-      "key": "rank_21",
       "screening_id": 21,
-      "rank": 21,
+      "key": "rank_21",
       "official_name": "ConvNeXt-Base DINOv3",
       "model_id": "convnext_base.dinov3_lvd1689m",
       "parameters_m": 87.57,
@@ -477,19 +515,21 @@
         0.224,
         0.225
       ],
+      "resize_interpolation": "bilinear",
       "classifier_names": [
         "head.fc"
       ],
+      "weight_path": "/home/chenqingjian/four_test/Hoolock/model/shortlist_50_20260502/21_convnext_base.dinov3_lvd1689m/model.safetensors",
+      "weight_bytes": 350300064,
+      "weight_sha256": "afa69ae6094b5b04a48810de78c52c92d4cbb6d9436462f07bf36defb09e26c1",
       "freeze_backbone": false,
       "initial_physical_microbatch": 16,
       "initial_gpu_count": 1,
-      "weight_relative_path": "21_convnext_base.dinov3_lvd1689m/model.safetensors",
-      "weight_sha256": "afa69ae6094b5b04a48810de78c52c92d4cbb6d9436462f07bf36defb09e26c1"
+      "override_reason": null
     },
     {
-      "key": "rank_23",
       "screening_id": 23,
-      "rank": 23,
+      "key": "rank_23",
       "official_name": "MambaOut-Base+",
       "model_id": "mambaout_base_plus_rw.sw_e150_r384_in12k_ft_in1k",
       "parameters_m": 101.66,
@@ -504,19 +544,21 @@
         0.224,
         0.225
       ],
+      "resize_interpolation": "bilinear",
       "classifier_names": [
         "head.fc"
       ],
+      "weight_path": "/home/chenqingjian/four_test/Hoolock/model/shortlist_50_20260502/23_mambaout_base_plus_rw.sw_e150_r384_in12k_ft_in1k/model.safetensors",
+      "weight_bytes": 406664120,
+      "weight_sha256": "e027354794ff2fc97f4669a5a04d749e9e25aa4a34338abf9f9760ef76b65ea4",
       "freeze_backbone": false,
       "initial_physical_microbatch": 16,
       "initial_gpu_count": 1,
-      "weight_relative_path": "23_mambaout_base_plus_rw.sw_e150_r384_in12k_ft_in1k/model.safetensors",
-      "weight_sha256": "e027354794ff2fc97f4669a5a04d749e9e25aa4a34338abf9f9760ef76b65ea4"
+      "override_reason": null
     },
     {
-      "key": "rank_24",
       "screening_id": 24,
-      "rank": 24,
+      "key": "rank_24",
       "official_name": "MobileNetV3-Large",
       "model_id": "mobilenetv3_large_100.ra_in1k",
       "parameters_m": 5.48,
@@ -531,19 +573,21 @@
         0.224,
         0.225
       ],
+      "resize_interpolation": "bilinear",
       "classifier_names": [
         "classifier"
       ],
+      "weight_path": "/home/chenqingjian/four_test/Hoolock/model/shortlist_50_20260502/24_mobilenetv3_large_100.ra_in1k/model.safetensors",
+      "weight_bytes": 22058321,
+      "weight_sha256": "f425af34cc1cead2b5d6211f789a1f30b94835dc32f9c0fcc5a916e4fd2dde85",
       "freeze_backbone": false,
       "initial_physical_microbatch": 16,
       "initial_gpu_count": 1,
-      "weight_relative_path": "24_mobilenetv3_large_100.ra_in1k/model.safetensors",
-      "weight_sha256": "f425af34cc1cead2b5d6211f789a1f30b94835dc32f9c0fcc5a916e4fd2dde85"
+      "override_reason": null
     },
     {
-      "key": "rank_25",
       "screening_id": 25,
-      "rank": 25,
+      "key": "rank_25",
       "official_name": "MobileNetV4 Conv Large",
       "model_id": "mobilenetv4_conv_large.e600_r384_in1k",
       "parameters_m": 32.59,
@@ -558,19 +602,21 @@
         0.224,
         0.225
       ],
+      "resize_interpolation": "bilinear",
       "classifier_names": [
         "classifier"
       ],
+      "weight_path": "/home/chenqingjian/four_test/Hoolock/model/shortlist_50_20260502/25_mobilenetv4_conv_large.e600_r384_in1k/model.safetensors",
+      "weight_bytes": 131022456,
+      "weight_sha256": "e7e2c1035dec14ac89c325183211eee5b593ad04d51625f22db5cdd8f3054ca5",
       "freeze_backbone": false,
       "initial_physical_microbatch": 16,
       "initial_gpu_count": 1,
-      "weight_relative_path": "25_mobilenetv4_conv_large.e600_r384_in1k/model.safetensors",
-      "weight_sha256": "e7e2c1035dec14ac89c325183211eee5b593ad04d51625f22db5cdd8f3054ca5"
+      "override_reason": null
     },
     {
-      "key": "rank_26",
       "screening_id": 26,
-      "rank": 26,
+      "key": "rank_26",
       "official_name": "MobileNetV4 Hybrid Large",
       "model_id": "mobilenetv4_hybrid_large.e600_r384_in1k",
       "parameters_m": 37.76,
@@ -585,19 +631,21 @@
         0.224,
         0.225
       ],
+      "resize_interpolation": "bilinear",
       "classifier_names": [
         "classifier"
       ],
+      "weight_path": "/home/chenqingjian/four_test/Hoolock/model/shortlist_50_20260502/26_mobilenetv4_hybrid_large.e600_r384_in1k/model.safetensors",
+      "weight_bytes": 151794472,
+      "weight_sha256": "2e1d69630b534a1b839d8c5f441cd38473aa622aac8abbf17255c8f259301580",
       "freeze_backbone": false,
       "initial_physical_microbatch": 16,
       "initial_gpu_count": 1,
-      "weight_relative_path": "26_mobilenetv4_hybrid_large.e600_r384_in1k/model.safetensors",
-      "weight_sha256": "2e1d69630b534a1b839d8c5f441cd38473aa622aac8abbf17255c8f259301580"
+      "override_reason": null
     },
     {
-      "key": "rank_27",
       "screening_id": 27,
-      "rank": 27,
+      "key": "rank_27",
       "official_name": "MobileNetV5-300M (Gemma 3n)",
       "model_id": "mobilenetv5_300m.gemma3n",
       "parameters_m": 294.13,
@@ -612,19 +660,21 @@
         1.0,
         1.0
       ],
+      "resize_interpolation": "bilinear",
       "classifier_names": [
         "classifier"
       ],
+      "weight_path": "/home/chenqingjian/four_test/Hoolock/model/shortlist_50_20260502/27_mobilenetv5_300m.gemma3n/model.safetensors",
+      "weight_bytes": 1176564736,
+      "weight_sha256": "affbbd57927c4138b783564d98603ef54530eb02ddf25cbabf79a4b2ce0fb321",
       "freeze_backbone": true,
       "initial_physical_microbatch": 4,
       "initial_gpu_count": 1,
-      "weight_relative_path": "27_mobilenetv5_300m.gemma3n/model.safetensors",
-      "weight_sha256": "affbbd57927c4138b783564d98603ef54530eb02ddf25cbabf79a4b2ce0fb321"
+      "override_reason": "documented MobileNetV5-300M memory exception"
     },
     {
-      "key": "rank_28",
       "screening_id": 28,
-      "rank": 28,
+      "key": "rank_28",
       "official_name": "MobileViTv2-2.0",
       "model_id": "mobilevitv2_200.cvnets_in22k_ft_in1k_384",
       "parameters_m": 18.45,
@@ -639,19 +689,21 @@
         1.0,
         1.0
       ],
+      "resize_interpolation": "bilinear",
       "classifier_names": [
         "head.fc"
       ],
+      "weight_path": "/home/chenqingjian/four_test/Hoolock/model/shortlist_50_20260502/28_mobilevitv2_200.cvnets_in22k_ft_in1k_384/model.safetensors",
+      "weight_bytes": 73949722,
+      "weight_sha256": "6861765a574098ff065387faeec5d14f2aaf8160217ff36fcb5c6f8634395b25",
       "freeze_backbone": false,
       "initial_physical_microbatch": 16,
       "initial_gpu_count": 1,
-      "weight_relative_path": "28_mobilevitv2_200.cvnets_in22k_ft_in1k_384/model.safetensors",
-      "weight_sha256": "6861765a574098ff065387faeec5d14f2aaf8160217ff36fcb5c6f8634395b25"
+      "override_reason": null
     },
     {
-      "key": "rank_31",
       "screening_id": 31,
-      "rank": 31,
+      "key": "rank_31",
       "official_name": "ViT-Base/16 AugReg",
       "model_id": "vit_base_patch16_224.augreg_in21k_ft_in1k",
       "parameters_m": 86.57,
@@ -666,19 +718,21 @@
         0.5,
         0.5
       ],
+      "resize_interpolation": "bilinear",
       "classifier_names": [
         "head"
       ],
+      "weight_path": "/home/chenqingjian/four_test/Hoolock/model/shortlist_50_20260502/31_vit_base_patch16_224.augreg_in21k_ft_in1k/model.safetensors",
+      "weight_bytes": 346284714,
+      "weight_sha256": "32aa17d6e17b43500f531d5f6dc9bc93e56ed8841b8a75682e1bb295d722405b",
       "freeze_backbone": false,
       "initial_physical_microbatch": 16,
       "initial_gpu_count": 1,
-      "weight_relative_path": "31_vit_base_patch16_224.augreg_in21k_ft_in1k/model.safetensors",
-      "weight_sha256": "32aa17d6e17b43500f531d5f6dc9bc93e56ed8841b8a75682e1bb295d722405b"
+      "override_reason": null
     },
     {
-      "key": "rank_35",
       "screening_id": 35,
-      "rank": 35,
+      "key": "rank_35",
       "official_name": "Swin-Tiny",
       "model_id": "swin_tiny_patch4_window7_224.ms_in22k_ft_in1k",
       "parameters_m": 28.29,
@@ -693,19 +747,21 @@
         0.224,
         0.225
       ],
+      "resize_interpolation": "bilinear",
       "classifier_names": [
         "head.fc"
       ],
+      "weight_path": "/home/chenqingjian/four_test/Hoolock/model/shortlist_50_20260502/35_swin_tiny_patch4_window7_224.ms_in22k_ft_in1k/model.safetensors",
+      "weight_bytes": 114286722,
+      "weight_sha256": "ccf222293c0b68831517657388e1adbb58094d6cf7c65938abd37f7bf782aa1f",
       "freeze_backbone": false,
       "initial_physical_microbatch": 16,
       "initial_gpu_count": 1,
-      "weight_relative_path": "35_swin_tiny_patch4_window7_224.ms_in22k_ft_in1k/model.safetensors",
-      "weight_sha256": "ccf222293c0b68831517657388e1adbb58094d6cf7c65938abd37f7bf782aa1f"
+      "override_reason": null
     },
     {
-      "key": "rank_36",
       "screening_id": 36,
-      "rank": 36,
+      "key": "rank_36",
       "official_name": "Swin-Large",
       "model_id": "swin_large_patch4_window12_384.ms_in22k_ft_in1k",
       "parameters_m": 196.74,
@@ -720,19 +776,21 @@
         0.224,
         0.225
       ],
+      "resize_interpolation": "bilinear",
       "classifier_names": [
         "head.fc"
       ],
+      "weight_path": "/home/chenqingjian/four_test/Hoolock/model/shortlist_50_20260502/36_swin_large_patch4_window12_384.ms_in22k_ft_in1k/model.safetensors",
+      "weight_bytes": 800582904,
+      "weight_sha256": "77b8450425f08d46967f1f115c817bdfc730e461c95d41d177714f507da31c21",
       "freeze_backbone": false,
       "initial_physical_microbatch": 16,
       "initial_gpu_count": 1,
-      "weight_relative_path": "36_swin_large_patch4_window12_384.ms_in22k_ft_in1k/model.safetensors",
-      "weight_sha256": "77b8450425f08d46967f1f115c817bdfc730e461c95d41d177714f507da31c21"
+      "override_reason": null
     },
     {
-      "key": "rank_37",
       "screening_id": 37,
-      "rank": 37,
+      "key": "rank_37",
       "official_name": "SwinV2-Large",
       "model_id": "swinv2_large_window12to24_192to384.ms_in22k_ft_in1k",
       "parameters_m": 196.74,
@@ -747,19 +805,21 @@
         0.224,
         0.225
       ],
+      "resize_interpolation": "bilinear",
       "classifier_names": [
         "head.fc"
       ],
+      "weight_path": "/home/chenqingjian/four_test/Hoolock/model/shortlist_50_20260502/37_swinv2_large_window12to24_192to384.ms_in22k_ft_in1k/model.safetensors",
+      "weight_bytes": 813545880,
+      "weight_sha256": "204631b53b5d8e2a4382403673e15938caa59b052fbb6472ac428355a39f7545",
       "freeze_backbone": false,
       "initial_physical_microbatch": 16,
       "initial_gpu_count": 2,
-      "weight_relative_path": "37_swinv2_large_window12to24_192to384.ms_in22k_ft_in1k/model.safetensors",
-      "weight_sha256": "204631b53b5d8e2a4382403673e15938caa59b052fbb6472ac428355a39f7545"
+      "override_reason": "existing model manifest recommends two GPUs"
     },
     {
-      "key": "rank_39",
       "screening_id": 39,
-      "rank": 39,
+      "key": "rank_39",
       "official_name": "CoAtNet-RMLP-2",
       "model_id": "coatnet_rmlp_2_rw_384.sw_in12k_ft_in1k",
       "parameters_m": 73.88,
@@ -774,19 +834,21 @@
         0.5,
         0.5
       ],
+      "resize_interpolation": "bilinear",
       "classifier_names": [
         "head.fc"
       ],
+      "weight_path": "/home/chenqingjian/four_test/Hoolock/model/shortlist_50_20260502/39_coatnet_rmlp_2_rw_384.sw_in12k_ft_in1k/model.safetensors",
+      "weight_bytes": 295695280,
+      "weight_sha256": "91570c7af10fea0af03c1b0a49be3e4775596239890eb4193c75129b3045623e",
       "freeze_backbone": false,
       "initial_physical_microbatch": 16,
       "initial_gpu_count": 1,
-      "weight_relative_path": "39_coatnet_rmlp_2_rw_384.sw_in12k_ft_in1k/model.safetensors",
-      "weight_sha256": "91570c7af10fea0af03c1b0a49be3e4775596239890eb4193c75129b3045623e"
+      "override_reason": null
     },
     {
-      "key": "rank_41",
       "screening_id": 41,
-      "rank": 41,
+      "key": "rank_41",
       "official_name": "DINOv3 ViT-S/16",
       "model_id": "vit_small_patch16_dinov3.lvd1689m",
       "parameters_m": 21.59,
@@ -801,19 +863,21 @@
         0.224,
         0.225
       ],
+      "resize_interpolation": "bilinear",
       "classifier_names": [
         "head"
       ],
+      "weight_path": "/home/chenqingjian/four_test/Hoolock/model/shortlist_50_20260502/41_vit_small_patch16_dinov3.lvd1689m/model.safetensors",
+      "weight_bytes": 86362376,
+      "weight_sha256": "2a1ec16ae28ffa07bc0ead0241ee7df9fc26451fe6f9f839b7b3afa0a906b040",
       "freeze_backbone": false,
       "initial_physical_microbatch": 16,
       "initial_gpu_count": 1,
-      "weight_relative_path": "41_vit_small_patch16_dinov3.lvd1689m/model.safetensors",
-      "weight_sha256": "2a1ec16ae28ffa07bc0ead0241ee7df9fc26451fe6f9f839b7b3afa0a906b040"
+      "override_reason": null
     },
     {
-      "key": "rank_42",
       "screening_id": 42,
-      "rank": 42,
+      "key": "rank_42",
       "official_name": "DINOv3 ViT-B/16",
       "model_id": "vit_base_patch16_dinov3.lvd1689m",
       "parameters_m": 85.64,
@@ -828,14 +892,17 @@
         0.224,
         0.225
       ],
+      "resize_interpolation": "bilinear",
       "classifier_names": [
         "head"
       ],
+      "weight_path": "/home/chenqingjian/four_test/Hoolock/model/shortlist_50_20260502/42_vit_base_patch16_dinov3.lvd1689m/model.safetensors",
+      "weight_bytes": 342579728,
+      "weight_sha256": "1f9ed8a2378d65e24bb710ba522ac9fa7be4e036d7aefb4384ce022833926332",
       "freeze_backbone": false,
       "initial_physical_microbatch": 16,
       "initial_gpu_count": 1,
-      "weight_relative_path": "42_vit_base_patch16_dinov3.lvd1689m/model.safetensors",
-      "weight_sha256": "1f9ed8a2378d65e24bb710ba522ac9fa7be4e036d7aefb4384ce022833926332"
+      "override_reason": null
     }
   ]
 }

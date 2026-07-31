@@ -1,8 +1,17 @@
 # 白眉长臂猿牙齿图像分类：论文复现代码
 
-本目录是面向论文审稿的独立代码包，覆盖数据清单校验、离线增强、31 个模型训练与评估、结果汇总，以及 ConvNeXt Grad-CAM。代码不依赖原服务器路径，数据和权重均通过命令行参数传入。
+本仓库是面向论文审稿的独立代码包，覆盖数据清单校验、离线增强、按冻结的 SAM31 协议训练和评估 31 个模型、结果汇总，以及 ConvNeXt Grad-CAM。面向审稿人的代码不依赖原服务器路径，数据集、清单和模型权重位置均通过命令行参数传入。
 
 英文说明见 [README.md](README.md)。
+
+## 冻结协议
+
+当前 main 分支以冻结协议 `sam31_e73b33b_v1` 为准，规范候选为 `e73b33b`（ConvNeXt-Base，`convnext_base.fb_in22k_ft_in1k`）。
+
+- `configs/sam31_e73b33b.json`：规范协议定义。
+- `configs/sam31_e73b33b_models.lock.json`：服务器端 31 个模型权重和运行例外的审计锁定文件。
+- `configs/models_31.json`：可移植的 31 模型注册表，含相对权重路径和 SHA-256 哈希。
+- `results/table_s4_results.csv`：论文 Table S4 使用的最终 31 模型指标。
 
 ## 论文实验口径
 
@@ -11,25 +20,34 @@
 - 训练原图：258 张、60 个体。
 - 最终训练集：1984 张，包括 258 张原图、436 张博物馆风格化图像和 1290 张离线增强图像。
 - 测试集：82 张原图、15 个体；个体不跨训练集和测试集。
-- 在线增强：`RandomResizedCrop(0.85-1.00, ratio=1:1)`、水平翻转 `p=0.5`、5 度旋转 `p=0.5`、亮度抖动 `0.1`。
+- 在线增强：直接正方形缩放至各模型原生输入尺寸、水平翻转 `p=0.5`、5 度旋转 `p=0.5`、亮度抖动 `0.1`。冻结协议不使用 `RandomResizedCrop`。
 - 优化：AdamW，初始学习率 `3e-4`，权重衰减 `0.01`，余弦退火，最多 200 epoch，早停 patience 30。
+- SAM：非自适应 SAM，`rho=0.05`，参数精确恢复，对所有可训练梯度计算全局 L2 范数。
 - 损失：按训练类别频数倒数加权的交叉熵。
-- 选择指标：Macro-F1。
+- 选择指标：Macro-F1，因没有单独验证集而在测试集上监测。
 - 输入大小：各模型使用 `configs/models_31.json` 记录的预训练分辨率。
+
+逻辑 batch size 为 16，默认物理 micro-batch 为 16。模型注册表记录的审计例外如下：
+
+- EfficientNet-B7：输入 600，物理 micro-batch 4，逻辑 batch 仍为 16。
+- MobileNetV5-300M：冻结 backbone，物理 micro-batch 4，仅训练分类头。
+- SwinV2-Large：两卡 DataParallel。
 
 ## 重要评估说明
 
-原实验没有单独验证集。测试集同时用于逐 epoch 的早停、最佳 checkpoint 选择和最终指标报告。因此结果是“测试集参与模型选择”的实验结果，可能比完全独立测试评估乐观。发布代码忠实保留这一流程，并在 `selection_split: test` 中显式记录。
+原实验没有单独验证集。测试集同时用于逐 epoch 早停、最佳 checkpoint 选择和最终指标报告。因此结果是“测试集参与模型选择”的实验结果，可能比完全独立测试评估乐观。发布代码忠实保留这一流程，并在 `selection_split: test` 中显式记录。
+
+测试推理保持干净和确定：每张图一个视图、一次前向、无 TTA、无校准、无阈值调参、无集成，决策规则为简单 `argmax`。
 
 ## 文件结构
 
 ```text
-configs/                    统一实验参数和 31 模型清单
-metadata/dataset_manifest.csv  可移植的 2066 行图像清单
-results/table_s4_results.csv   论文 Table S4 的 31 模型结果
-scripts/                    清单、离线增强、批量运行和汇总脚本
-src/                        数据、变换、模型、训练、指标和 Grad-CAM
-tests/                      计数、指标、配置和变换测试
+configs/                      SAM31 协议、模型锁定文件和 31 模型注册表
+metadata/dataset_manifest.csv   可移植的 2066 行图像清单
+results/table_s4_results.csv   论文 Table S4 的最终 SAM31 31 模型结果
+scripts/                      清单、离线增强、批量运行和汇总脚本
+src/                          数据、变换、模型、SAM 训练、指标和 Grad-CAM
+tests/                        计数、指标、协议元数据和变换测试
 ```
 
 ## 环境
@@ -94,25 +112,39 @@ python -m src.train \
   --no-pretrained --dry-run
 ```
 
-训练 ConvNeXt-Base：
+要严格复现锁定协议，请通过 `--checkpoint` 传入审计过的服务器权重，或在批量脚本中使用 `--checkpoint-root`：
 
 ```bash
 python -m src.train \
   --model-key convnext_base \
-  --data-root /path/to/dataset_augmented
+  --data-root /path/to/dataset_augmented \
+  --checkpoint /path/to/weights/18_convnext_base.fb_in22k_ft_in1k/model.safetensors
 ```
 
-依次运行 31 个模型：
+未传 checkpoint 时，timm 会在可用时尝试下载预训练权重。锁定权重不存储在本仓库中；`models_31.json` 记录其相对路径和 SHA-256，`sam31_e73b33b_models.lock.json` 记录服务器端审计绝对路径。
+
+使用注册表里的模型专用 GPU 和 micro-batch 设置依次运行 31 个模型：
 
 ```bash
 nohup python scripts/run_model_zoo.py \
   --data-root /path/to/dataset_augmented \
+  --checkpoint-root /path/to/weights \
   --continue-on-error > model_zoo.log 2>&1 &
 ```
 
-大多数模型使用 batch size 16。实际结果中的两个例外已写入模型配置：EfficientNet-B7 使用 batch size 4；MobileNetV5-300M 使用 micro-batch 4、4 步梯度累积、学习率 `1e-5`，冻结 backbone，仅训练分类头。
+`--checkpoint-root` 可选；传入后，每个模型会以 `--checkpoint <root>/<weight_relative_path>` 启动，路径来自 `configs/models_31.json`。
 
-31 模型中 EfficientNet-B3 的数值性能最高；ConvNeXt-Base 因保持较高分类性能且 Grad-CAM 在牙冠区域的定位更清晰，被选作论文形态解释模型。
+## 结果
+
+`results/table_s4_results.csv` 包含全部 31 个模型的最终 SAM31 结果。冻结运行中的最优模型为 ConvNeXt-Base：
+
+- Accuracy：92.68%（76/82）
+- Balanced accuracy：90.15%
+- Macro-F1：91.55%
+- KIZ011338：2/2 正确
+- MCZ26474：16/16 正确
+
+这些结果以测试集作为模型选择划分，论文中应明确描述为 test-guided optimization。
 
 ## Grad-CAM
 
@@ -130,12 +162,9 @@ python -m src.gradcam \
 
 输出按 `original/`、`heatmap/` 和 `overlay/` 分开保存，并生成 `gradcam_manifest.csv`。
 
-## Grad-CAM 补充材料
+## Release 材料
 
-完整审稿材料可从 [Grad-CAM Reviewer Materials Release](https://github.com/CjQkJ/hoolock-gibbon-dental-classification/releases/tag/reviewer-materials-v1) 下载：
-
-- [英文 Grad-CAM 包](https://github.com/CjQkJ/hoolock-gibbon-dental-classification/releases/download/reviewer-materials-v1/GradCAM_English.zip)
-- [中文 Grad-CAM 与结果包](https://github.com/CjQkJ/hoolock-gibbon-dental-classification/releases/download/reviewer-materials-v1/GradCAM_Chinese_with_results.zip)
+Grad-CAM 审稿材料通过 GitHub Releases 发布。较早的 `reviewer-materials-v1` 标签发布于 SAM31 协议更新之前，不代表当前 main 分支；分享 Grad-CAM 材料时应使用本次 SAM31 更新之后发布的 release。
 
 ## 测试
 

@@ -1,8 +1,17 @@
 # Hoolock Dental-Image Classification: Reproducibility Code for the Manuscript
 
-This directory contains a standalone code package prepared for manuscript review. It covers dataset-manifest validation, offline augmentation, training and evaluation of 31 models, result aggregation, and ConvNeXt Grad-CAM analysis. The code does not depend on paths from the original server; dataset and weight locations are supplied through command-line arguments.
+This repository is the standalone code package prepared for manuscript review. It covers dataset-manifest validation, offline augmentation, training and evaluation of 31 models under the frozen SAM31 protocol, result aggregation, and ConvNeXt Grad-CAM analysis. The reviewer-facing code does not depend on the original server paths; dataset, manifest, and model-weight locations are supplied through command-line arguments.
 
 For the Chinese documentation, see [README_ZH.md](README_ZH.md).
+
+## Frozen Protocol
+
+The current main branch is aligned with the frozen protocol `sam31_e73b33b_v1`, whose canonical candidate is `e73b33b` (ConvNeXt-Base, `convnext_base.fb_in22k_ft_in1k`).
+
+- `configs/sam31_e73b33b.json`: canonical protocol definition.
+- `configs/sam31_e73b33b_models.lock.json`: server-side audit lock for the 31 model weights and run-time exceptions.
+- `configs/models_31.json`: portable 31-model registry with relative weight paths and SHA-256 hashes.
+- `results/table_s4_results.csv`: final 31-model metrics reported in Table S4.
 
 ## Experimental Scope of the Manuscript
 
@@ -11,25 +20,34 @@ For the Chinese documentation, see [README_ZH.md](README_ZH.md).
 - Original training data: 258 images from 60 individuals.
 - Final training set: 1,984 images, comprising 258 original images, 436 museum-style augmented images, and 1,290 offline-augmented images.
 - Test set: 82 original images from 15 individuals; no individual occurred in both the training and test sets.
-- Online augmentation: `RandomResizedCrop(0.85-1.00, ratio=1:1)`, horizontal flipping with `p=0.5`, rotation by up to 5 degrees with `p=0.5`, and brightness jitter with an amplitude of `0.1`.
-- Optimization: AdamW with an initial learning rate of `3e-4`, weight decay of `0.01`, cosine annealing, a maximum of 200 epochs, and an early-stopping patience of 30 epochs.
+- Online augmentation: direct square resize to each model's native input size, horizontal flipping with `p=0.5`, rotation by up to 5 degrees with `p=0.5`, and brightness jitter with an amplitude of `0.1`. The frozen protocol does not use `RandomResizedCrop`.
+- Optimization: AdamW with an initial learning rate of `3e-4`, weight decay of `0.01`, cosine annealing, a maximum of 200 epochs, and early-stopping patience of 30 epochs.
+- SAM: non-adaptive SAM with `rho=0.05`, exact parameter restoration, and a global L2 norm over all trainable gradients.
 - Loss: cross-entropy weighted inversely by training-class frequency.
-- Model-selection metric: Macro-F1.
+- Model-selection metric: Macro-F1, monitored on the test set because no separate validation split was used.
 - Input size: each model used the pretrained input resolution recorded in `configs/models_31.json`.
+
+The logical batch size is 16. The default physical micro-batch size is 16. The audited exceptions encoded in the model registry are:
+
+- EfficientNet-B7: input size 600, physical micro-batch 4, logical batch remains 16.
+- MobileNetV5-300M: frozen backbone, physical micro-batch 4, only the classification head is trained.
+- SwinV2-Large: two GPUs with DataParallel.
 
 ## Important Evaluation Note
 
 The original experiment did not use a separate validation set. The test set was evaluated after every epoch and was used for early stopping, best-checkpoint selection, and final metric reporting. The reported results therefore reflect a protocol in which the test set participated in model selection and may be optimistic relative to evaluation on a fully independent test set. The release code faithfully preserves this procedure and records it explicitly as `selection_split: test`.
 
+Test inference is kept clean and deterministic: one view per image, one forward pass, no TTA, no calibration, no threshold tuning, no ensembling, and a simple `argmax` decision rule.
+
 ## Directory Structure
 
 ```text
-configs/                       Unified experiment parameters and the 31-model registry
+configs/                       SAM31 protocol, model lock, and 31-model registry
 metadata/dataset_manifest.csv  Portable image manifest containing 2,066 records
-results/table_s4_results.csv   Results for the 31 models reported in Table S4
+results/table_s4_results.csv   Final SAM31 results for the 31 models in Table S4
 scripts/                       Manifest, offline augmentation, batch execution, and summary scripts
-src/                           Data, transforms, models, training, metrics, and Grad-CAM code
-tests/                         Tests for counts, metrics, configuration, and transforms
+src/                           Data, transforms, models, SAM training, metrics, and Grad-CAM code
+tests/                         Tests for counts, metrics, protocol metadata, and transforms
 ```
 
 ## Environment
@@ -94,25 +112,39 @@ python -m src.train \
   --no-pretrained --dry-run
 ```
 
-Train ConvNeXt-Base:
+For exact reproduction of the locked protocol, pass the audited server weights through `--checkpoint` or use `--checkpoint-root` in the batch script:
 
 ```bash
 python -m src.train \
   --model-key convnext_base \
-  --data-root /path/to/dataset_augmented
+  --data-root /path/to/dataset_augmented \
+  --checkpoint /path/to/weights/18_convnext_base.fb_in22k_ft_in1k/model.safetensors
 ```
 
-Run the 31 models sequentially:
+If no checkpoint is supplied, timm will attempt to download pretrained weights when available. The locked weights are not stored in this repository; `models_31.json` records their relative paths and SHA-256 hashes, and `sam31_e73b33b_models.lock.json` records the audited server-side absolute paths.
+
+Run the 31 models sequentially with the model-specific GPU and micro-batch settings from the registry:
 
 ```bash
 nohup python scripts/run_model_zoo.py \
   --data-root /path/to/dataset_augmented \
+  --checkpoint-root /path/to/weights \
   --continue-on-error > model_zoo.log 2>&1 &
 ```
 
-Most models used a batch size of 16. Two exceptions in the actual run records are encoded in the model configuration: EfficientNet-B7 used a batch size of 4; MobileNetV5-300M used a micro-batch size of 4, four gradient-accumulation steps, a learning rate of `1e-5`, and a frozen backbone, with only the classification head trained.
+`--checkpoint-root` is optional. When supplied, each model is started with `--checkpoint <root>/<weight_relative_path>` from `configs/models_31.json`.
 
-Among the 31 models, EfficientNet-B3 achieved the best numerical performance. ConvNeXt-Base was selected for morphological interpretation because it retained high classification performance and produced cleaner Grad-CAM localization over the tooth crown.
+## Results
+
+`results/table_s4_results.csv` contains the final SAM31 results for all 31 models. The best model in the frozen run was ConvNeXt-Base:
+
+- Accuracy: 92.68% (76/82)
+- Balanced accuracy: 90.15%
+- Macro-F1: 91.55%
+- KIZ011338: 2/2 correct
+- MCZ26474: 16/16 correct
+
+These results were selected with the test set as the model-selection split and must be described in the manuscript as test-guided optimization.
 
 ## Grad-CAM
 
@@ -130,12 +162,9 @@ python -m src.gradcam \
 
 Outputs are stored separately under `original/`, `heatmap/`, and `overlay/`, together with a `gradcam_manifest.csv` file.
 
-## Supplementary Grad-CAM Packages
+## Release Assets
 
-The complete reviewer packages are available from the [Grad-CAM Reviewer Materials release](https://github.com/CjQkJ/hoolock-gibbon-dental-classification/releases/tag/reviewer-materials-v1):
-
-- [English Grad-CAM package](https://github.com/CjQkJ/hoolock-gibbon-dental-classification/releases/download/reviewer-materials-v1/GradCAM_English.zip)
-- [Chinese Grad-CAM package with results](https://github.com/CjQkJ/hoolock-gibbon-dental-classification/releases/download/reviewer-materials-v1/GradCAM_Chinese_with_results.zip)
+Grad-CAM reviewer packages are distributed through GitHub Releases. The earlier `reviewer-materials-v1` tag was published before the SAM31 protocol update and does not correspond to the current main branch; use a release published after this SAM31 update when sharing Grad-CAM materials.
 
 ## Tests
 

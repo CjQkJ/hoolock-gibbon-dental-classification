@@ -20,6 +20,7 @@ from torch.utils.tensorboard import SummaryWriter
 from .data import ManifestDataset, collate_batch
 from .metrics import classification_metrics
 from .models import build_model, trainable_parameter_count
+from .sam import sam_optimizer_step
 from .transforms import build_transforms
 
 
@@ -104,18 +105,20 @@ def write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="复现论文中的 Hoolock 牙齿图像二分类实验。")
+    parser = argparse.ArgumentParser(description="Reproduce the fixed SAM-31 Hoolock dental classification protocol.")
     parser.add_argument("--config", default="configs/experiment.yaml")
     parser.add_argument("--models", default="configs/models_31.json")
     parser.add_argument("--model-key", required=True)
     parser.add_argument("--data-root", required=True)
     parser.add_argument("--manifest", default=None)
     parser.add_argument("--output-root", default="runs")
-    parser.add_argument("--checkpoint", default=None, help="加载已有模型权重；用于评估或继续实验。")
+    parser.add_argument("--checkpoint", default=None, help="Load a local model weight or checkpoint for evaluation or training.")
+    parser.add_argument("--physical-microbatch", type=int, default=None)
+    parser.add_argument("--gpu-count", type=int, default=None)
     parser.add_argument("--num-workers", type=int, default=4)
     parser.add_argument("--device", default="cuda")
     parser.add_argument("--data-parallel", action="store_true")
-    parser.add_argument("--no-pretrained", action="store_true", help="不下载预训练权重，适用于结构烟雾测试。")
+    parser.add_argument("--no-pretrained", action="store_true", help="Do not download pretrained weights; useful for structure smoke tests.")
     parser.add_argument("--dry-run", action="store_true")
     return parser.parse_args()
 
@@ -142,17 +145,40 @@ def main() -> None:
         checkpoint=args.checkpoint,
         pretrained=not args.no_pretrained,
     ).to(device)
-    if args.data_parallel and device.type == "cuda" and torch.cuda.device_count() > 1:
-        model = nn.DataParallel(model)
+
+    requested_gpus = int(
+        args.gpu_count
+        or model_config.get("initial_gpu_count")
+        or model_config.get("recommended_gpus", 1)
+    )
+    use_data_parallel = args.data_parallel or requested_gpus > 1
+    if use_data_parallel and device.type == "cuda" and torch.cuda.device_count() >= requested_gpus:
+        model = nn.DataParallel(model, device_ids=list(range(requested_gpus)))
+
+    logical_batch = int(training.get("logical_batch_size", training["batch_size"]))
+    physical_microbatch = int(
+        args.physical_microbatch
+        or model_config.get("initial_physical_microbatch")
+        or training.get("default_physical_microbatch", logical_batch)
+    )
+    if physical_microbatch <= 0 or physical_microbatch > logical_batch:
+        raise ValueError(
+            f"physical_microbatch must be in [1, {logical_batch}], got {physical_microbatch}"
+        )
 
     effective = {
+        "protocol_id": config.get("protocol_id"),
         "model": model_config,
         "training": training,
+        "logical_batch_size": logical_batch,
+        "physical_microbatch": physical_microbatch,
+        "gpu_count": requested_gpus,
         "train_samples": len(train_dataset),
         "test_samples": len(test_dataset),
         "train_class_counts": dict(train_dataset.class_counts()),
         "test_class_counts": dict(test_dataset.class_counts()),
         "selection_split": "test",
+        "selection_metric": training.get("selection_metric", "macro_f1"),
         "trainable_parameters": trainable_parameter_count(model),
         "device": str(device),
         "seed": seed,
@@ -161,12 +187,10 @@ def main() -> None:
         print(json.dumps(effective, ensure_ascii=False, indent=2))
         return
 
-    batch_size = int(training["batch_size"])
-    accumulation_steps = int(training.get("gradient_accumulation_steps", 1))
     generator = torch.Generator().manual_seed(seed)
     train_loader = DataLoader(
         train_dataset,
-        batch_size=batch_size,
+        batch_size=logical_batch,
         shuffle=True,
         num_workers=args.num_workers,
         pin_memory=device.type == "cuda",
@@ -175,7 +199,7 @@ def main() -> None:
     )
     test_loader = DataLoader(
         test_dataset,
-        batch_size=batch_size,
+        batch_size=logical_batch,
         shuffle=False,
         num_workers=args.num_workers,
         pin_memory=device.type == "cuda",
@@ -199,6 +223,9 @@ def main() -> None:
     epochs = int(training["epochs"])
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=epochs)
     patience = int(training["early_stopping_patience"])
+    sam_config = training.get("sam") or {}
+    rho = float(sam_config.get("rho", 0.05))
+    norm_epsilon = float(sam_config.get("norm_epsilon", 1e-12))
     class_names = ["hoolock", "leuconedys"]
 
     best_metric = -1.0
@@ -210,20 +237,30 @@ def main() -> None:
     for epoch in range(1, epochs + 1):
         model.train()
         train_losses: list[float] = []
+        perturbed_losses: list[float] = []
+        first_norms: list[float] = []
+        second_norms: list[float] = []
         train_true: list[int] = []
         train_pred: list[int] = []
-        for step, (images, labels, _) in enumerate(train_loader, start=1):
-            images = images.to(device, non_blocking=True)
-            labels = labels.to(device, non_blocking=True)
-            logits = model(images)
-            loss = weighted_criterion(logits, labels) / accumulation_steps
-            loss.backward()
-            if step % accumulation_steps == 0 or step == len(train_loader):
-                optimizer.step()
-                optimizer.zero_grad(set_to_none=True)
-            train_losses.append(float(loss.item()) * accumulation_steps)
-            train_true.extend(labels.detach().cpu().tolist())
-            train_pred.extend(logits.detach().argmax(dim=1).cpu().tolist())
+        for images, labels, _ in train_loader:
+            result = sam_optimizer_step(
+                model,
+                images,
+                labels,
+                weighted_criterion,
+                optimizer,
+                device,
+                rho=rho,
+                norm_epsilon=norm_epsilon,
+                physical_microbatch=min(physical_microbatch, int(labels.shape[0])),
+            )
+            logits = result["logits"].float()
+            train_losses.append(float(result["unperturbed_loss"]))
+            perturbed_losses.append(float(result["perturbed_loss"]))
+            first_norms.append(float(result["first_grad_norm"]))
+            second_norms.append(float(result["second_grad_norm"]))
+            train_true.extend(labels.tolist())
+            train_pred.extend(torch.argmax(logits, dim=1).tolist())
 
         scheduler.step()
         test_metrics, prediction_rows = evaluate(
@@ -232,6 +269,9 @@ def main() -> None:
         row = {
             "epoch": epoch,
             "train_loss": float(np.mean(train_losses)),
+            "train_sam_perturbed_loss": float(np.mean(perturbed_losses)),
+            "sam_first_grad_norm": float(np.mean(first_norms)),
+            "sam_second_grad_norm": float(np.mean(second_norms)),
             "train_accuracy": float(accuracy_score(train_true, train_pred)),
             "train_balanced_accuracy": float(balanced_accuracy_score(train_true, train_pred)),
             "train_macro_f1": float(f1_score(train_true, train_pred, average="macro", zero_division=0)),
@@ -247,7 +287,7 @@ def main() -> None:
             if key != "epoch":
                 writer.add_scalar(key, value, epoch)
 
-        current_metric = float(test_metrics["macro_f1"])
+        current_metric = float(test_metrics[training.get("selection_metric", "macro_f1")])
         if current_metric > best_metric:
             best_metric = current_metric
             best_epoch = epoch
@@ -280,8 +320,11 @@ def main() -> None:
         "model_key": args.model_key,
         "best_epoch": best_epoch,
         "selection_split": "test",
-        "selection_metric": "macro_f1",
+        "selection_metric": training.get("selection_metric", "macro_f1"),
         "best_test_macro_f1": best_metric,
+        "logical_batch_size": logical_batch,
+        "physical_microbatch": physical_microbatch,
+        "gpu_count": requested_gpus,
         "epochs_completed": len(history),
     }
     with (run_dir / "run_summary.json").open("w", encoding="utf-8") as handle:
@@ -291,4 +334,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
