@@ -8,10 +8,10 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def test_sam31_protocol_json_declares_frozen_pipeline():
-    protocol = json.loads((ROOT / "configs/sam31_e73b33b.json").read_text(encoding="utf-8"))
-    assert protocol["protocol_id"] == "sam31_e73b33b_v1"
-    assert protocol["canonical_candidate"]["short_id"] == "e73b33b"
+def test_sam31_protocol_json_declares_reference_pipeline():
+    protocol = json.loads((ROOT / "configs/sam31_reference.json").read_text(encoding="utf-8"))
+    assert protocol["protocol_id"] == "sam31_reference_v1"
+    assert protocol["reference_run"]["model_id"] == "convnext_base.fb_in22k_ft_in1k"
     training = protocol["training"]
     assert training["seed"] == 20260507
     assert training["logical_batch_size"] == 16
@@ -33,7 +33,7 @@ def test_sam31_protocol_json_declares_frozen_pipeline():
 
 def test_experiment_yaml_uses_sam31_pipeline():
     config = yaml.safe_load((ROOT / "configs/experiment.yaml").read_text(encoding="utf-8"))
-    assert config["protocol_id"] == "sam31_e73b33b_v1"
+    assert config["protocol_id"] == "sam31_reference_v1"
     assert config["seed"] == 20260507
     assert config["online_augmentation"]["resize"] == "direct_square"
     assert config["training"]["sam"]["adaptive"] is False
@@ -42,8 +42,8 @@ def test_experiment_yaml_uses_sam31_pipeline():
 
 
 def test_models_31_matches_lock_and_expected_screening_ids():
-    protocol = json.loads((ROOT / "configs/sam31_e73b33b.json").read_text(encoding="utf-8"))
-    lock = json.loads((ROOT / "configs/sam31_e73b33b_models.lock.json").read_text(encoding="utf-8"))
+    protocol = json.loads((ROOT / "configs/sam31_reference.json").read_text(encoding="utf-8"))
+    lock = json.loads((ROOT / "configs/sam31_models.lock.json").read_text(encoding="utf-8"))
     models = json.loads((ROOT / "configs/models_31.json").read_text(encoding="utf-8"))["models"]
     assert len(models) == 31
     assert len({row["key"] for row in models}) == 31
@@ -77,10 +77,7 @@ def test_table_s4_reports_sam31_convnext_top_results():
     assert float(top["Accuracy (%)"]) == pytest.approx(92.6829268292683)
     assert float(top["Balanced accuracy (%)"]) == pytest.approx(90.14550264550265)
     assert float(top["Macro-F1 (%)"]) == pytest.approx(91.5521978021978)
-    assert top["KIZ011338 correct"] == "2"
-    assert top["KIZ011338 n"] == "2"
-    assert top["MCZ26474 correct"] == "16"
-    assert top["MCZ26474 n"] == "16"
+    assert all(not column.endswith(" correct") and not column.endswith(" n") for column in top)
 
     observed_order = [
         (-float(row["Macro-F1 (%)"]), -float(row["Accuracy (%)"]), int(row["Screening ID"]))

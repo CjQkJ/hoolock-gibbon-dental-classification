@@ -66,7 +66,7 @@ def build_manifest(data_root: Path) -> list[dict[str, str | int]]:
     return rows
 
 
-def validate(rows: list[dict[str, str | int]], strict_paper_counts: bool) -> None:
+def validate(rows: list[dict[str, str | int]], strict_expected_counts: bool) -> None:
     counts = Counter((row["split"], row["class_name"]) for row in rows)
     sources = Counter((row["split"], row["source_type"]) for row in rows)
     train_individuals = {row["individual_id"] for row in rows if row["split"] == "train"}
@@ -74,7 +74,7 @@ def validate(rows: list[dict[str, str | int]], strict_paper_counts: bool) -> Non
     overlap = train_individuals & test_individuals
     if overlap:
         raise ValueError(f"发现个体级数据泄漏: {sorted(overlap)}")
-    if strict_paper_counts:
+    if strict_expected_counts:
         expected_counts = {
             ("train", "hoolock"): 966,
             ("train", "leuconedys"): 1018,
@@ -88,7 +88,7 @@ def validate(rows: list[dict[str, str | int]], strict_paper_counts: bool) -> Non
             ("test", "original"): 82,
         }
         if counts != Counter(expected_counts) or sources != Counter(expected_sources):
-            raise ValueError(f"数据量与论文口径不一致: classes={counts}, sources={sources}")
+            raise ValueError(f"数据量与预期数据范围不一致: classes={counts}, sources={sources}")
     print(f"样本数: {len(rows)}")
     print(f"类别统计: {dict(counts)}")
     print(f"来源统计: {dict(sources)}")
@@ -99,10 +99,10 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--data-root", required=True)
     parser.add_argument("--output", default="metadata/dataset_manifest.csv")
-    parser.add_argument("--strict-paper-counts", action="store_true")
+    parser.add_argument("--strict-expected-counts", action="store_true")
     args = parser.parse_args()
     rows = build_manifest(Path(args.data_root))
-    validate(rows, args.strict_paper_counts)
+    validate(rows, args.strict_expected_counts)
     output = Path(args.output)
     output.parent.mkdir(parents=True, exist_ok=True)
     with output.open("w", encoding="utf-8", newline="") as handle:

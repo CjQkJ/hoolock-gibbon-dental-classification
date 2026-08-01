@@ -7,7 +7,7 @@ from torchvision.transforms import InterpolationMode
 def build_transforms(image_size: int, mean: tuple[float, ...], std: tuple[float, ...]):
     """Return the fixed SAM-31 online augmentation and deterministic test preprocessing.
 
-    The frozen e73b33b protocol uses a direct square resize during training,
+    The reference configuration uses a direct square resize during training,
     not RandomResizedCrop. Test inference is deterministic: one resize, tensor
     conversion, and normalization.
     """

@@ -44,8 +44,8 @@ def test_model_release_contains_31_unique_models():
 
 def test_public_release_metadata_is_portable():
     files = [
-        ROOT / "configs/sam31_e73b33b.json",
-        ROOT / "configs/sam31_e73b33b_models.lock.json",
+        ROOT / "configs/sam31_reference.json",
+        ROOT / "configs/sam31_models.lock.json",
         ROOT / "configs/models_31.json",
         ROOT / "results/table_s4_results.csv",
     ]

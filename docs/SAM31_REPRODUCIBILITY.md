@@ -1,19 +1,17 @@
 # SAM31 Reproducibility Record
 
-## Scope and Canonical Run
+## Reference Run and Scope
 
-This document specifies the frozen computational protocol represented by the
-current `main` branch. The protocol identifier is `sam31_e73b33b_v1`; its
-canonical candidate is commit `e73b33bf888e26be4833d39d776107b665e08900`
-(`e73b33b`) using ConvNeXt-Base (`convnext_base.fb_in22k_ft_in1k`). The
+This document specifies the reference computational configuration represented by the
+current `main` branch. The configuration identifier is `sam31_reference_v1`,
+using ConvNeXt-Base (`convnext_base.fb_in22k_ft_in1k`) as the primary model. The
 authoritative machine-readable records are
-`configs/sam31_e73b33b.json`, `configs/experiment.yaml`,
-`configs/models_31.json`, and `configs/sam31_e73b33b_models.lock.json`.
+`configs/sam31_reference.json`, `configs/experiment.yaml`,
+`configs/models_31.json`, and `configs/sam31_models.lock.json`.
 
-For the canonical ConvNeXt-Base run, the recorded test-set result was 76/82
+For the reference ConvNeXt-Base run, the recorded test-set result was 76/82
 correct images (accuracy 92.6829%, balanced accuracy 90.1455%, and Macro-F1
-91.5522%). KIZ011338 was correct for 2/2 test images and MCZ26474 was correct
-for 16/16 test images. The selected checkpoint was at epoch 23.
+91.5522%). The selected checkpoint was at epoch 23.
 
 ## Dataset and Split
 
@@ -73,9 +71,8 @@ descending accuracy, then ascending Screening ID.
 
 No separate validation split was used in the historical SAM31 experiment.
 The 82-image test set was monitored after each epoch for early stopping and
-checkpoint selection. Consequently, these values describe a test-guided
-model-selection protocol and should not be interpreted as performance on a
-fully independent holdout set. The code preserves this historical procedure
+checkpoint selection. Consequently, these values should not be interpreted as
+performance on a fully independent holdout set. The code preserves this historical procedure
 for auditability and exposes `selection_split: test` in effective run records.
 
 ## Reproduction Commands
@@ -89,7 +86,7 @@ python -m src.train \
   --no-pretrained --dry-run
 ```
 
-Run the canonical architecture with a verified audited pretrained weight:
+Run the reference architecture with a verified pretrained weight:
 
 ```bash
 python -m src.train \
@@ -109,12 +106,12 @@ python scripts/run_model_zoo.py \
 
 ## Reviewer Grad-CAM Release
 
-The reviewer-facing Grad-CAM materials are distributed through the GitHub
+The Grad-CAM comparison materials are distributed through the GitHub
 Release [`reviewer-materials-v1`](https://github.com/CjQkJ/hoolock-gibbon-dental-classification/releases/tag/reviewer-materials-v1).
-The current assets are `GradCAM_SAM31_e73b33b_English.zip` and
-`GradCAM_SAM31_e73b33b_Chinese.zip`. They contain 33 original images and 132
-Grad-CAM overlays for four selected models and four selected individuals,
-together with portable metadata and SHA-256 checksums. The package records
+The current assets are `sam31_gradcam_en.zip` and `sam31_gradcam_zh.zip`.
+They contain galleries for the four highest-ranked models by Macro-F1 and the
+ConvNeXt-Base no-style control, 340 source records per model, and 1,700 Grad-CAM
+images in total, together with portable metadata and SHA-256 checksums. The package records
 the true-class target, full heatmap overlay, model-specific target layers,
 and the absence of cutoff, masking, test-time augmentation, calibration,
 threshold tuning, and ensembling.

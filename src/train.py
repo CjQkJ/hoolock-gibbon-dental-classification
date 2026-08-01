@@ -151,7 +151,7 @@ def main() -> None:
     expected_test = int(config["data"]["test_samples"])
     if len(train_dataset) != expected_train or len(test_dataset) != expected_test:
         raise ValueError(
-            "Dataset counts do not match the frozen protocol: "
+            "Dataset counts do not match the reference configuration: "
             f"train={len(train_dataset)}/{expected_train}, "
             f"test={len(test_dataset)}/{expected_test}"
         )

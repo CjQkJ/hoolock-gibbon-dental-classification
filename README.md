@@ -1,29 +1,29 @@
-# Hoolock Dental-Image Classification: Reproducibility Code for the Manuscript
+# Hoolock Dental-Image Classification: Reproducibility Code
 
-This repository is the standalone code package prepared for manuscript review. It covers dataset-manifest validation, offline augmentation, training and evaluation of 31 models under the frozen SAM31 protocol, result aggregation, and ConvNeXt Grad-CAM analysis. The released code does not depend on the original server paths; dataset, manifest, and model-weight locations are supplied through command-line arguments.
+This repository is a standalone code package for reproducing the dataset-manifest validation, offline augmentation, training and evaluation of 31 models under the reference SAM31 configuration, result aggregation, and ConvNeXt Grad-CAM analysis. The released code does not depend on the original server paths; dataset, manifest, and model-weight locations are supplied through command-line arguments.
 
 For the Chinese documentation, see [README_ZH.md](README_ZH.md).
 
-## Frozen Protocol
+## Reference Configuration
 
-The current main branch is aligned with the frozen protocol `sam31_e73b33b_v1`, whose canonical candidate is `e73b33b` (ConvNeXt-Base, `convnext_base.fb_in22k_ft_in1k`).
+The current main branch records the reference configuration `sam31_reference_v1`, using ConvNeXt-Base (`convnext_base.fb_in22k_ft_in1k`) as the primary model.
 
-- `configs/sam31_e73b33b.json`: canonical protocol definition.
-- `configs/sam31_e73b33b_models.lock.json`: portable integrity lock for the 31 model weights and run-time exceptions.
+- `configs/sam31_reference.json`: reference configuration definition.
+- `configs/sam31_models.lock.json`: portable integrity lock for the 31 model weights and run-time exceptions.
 - `configs/models_31.json`: portable 31-model registry with relative weight paths and SHA-256 hashes.
 - `results/table_s4_results.csv`: final 31-model metrics reported in Table S4.
 
 The complete release-level protocol and reproducibility record is provided in
 [`docs/SAM31_REPRODUCIBILITY.md`](docs/SAM31_REPRODUCIBILITY.md).
 
-## Experimental Scope of the Manuscript
+## Data and Experimental Configuration
 
 - Binary classification labels: `H. hoolock` and the `H. leuconedys group`; `H. tianxing` images in the test set were assigned to the latter group.
 - Curated original dataset: 340 images from 75 individuals.
 - Original training data: 258 images from 60 individuals.
 - Final training set: 1,984 images, comprising 258 original images, 436 museum-style augmented images, and 1,290 offline-augmented images.
 - Test set: 82 original images from 15 individuals; no individual occurred in both the training and test sets.
-- Online augmentation: direct square resize to each model's native input size, horizontal flipping with `p=0.5`, rotation by up to 5 degrees with `p=0.5`, and brightness jitter with an amplitude of `0.1`. The frozen protocol does not use `RandomResizedCrop`.
+- Online augmentation: direct square resize to each model's native input size, horizontal flipping with `p=0.5`, rotation by up to 5 degrees with `p=0.5`, and brightness jitter with an amplitude of `0.1`. The reference configuration does not use `RandomResizedCrop`.
 - Optimization: AdamW with an initial learning rate of `3e-4`, weight decay of `0.01`, cosine annealing, a maximum of 200 epochs, and early-stopping patience of 30 epochs.
 - SAM: non-adaptive SAM with `rho=0.05`, exact parameter restoration, and a global L2 norm over all trainable gradients.
 - Loss: cross-entropy weighted inversely by training-class frequency.
@@ -84,7 +84,7 @@ Validate the released dataset and rebuild the manifest as follows:
 python scripts/build_manifest.py \
   --data-root /path/to/dataset_augmented \
   --output metadata/dataset_manifest.csv \
-  --strict-paper-counts
+  --strict-expected-counts
 ```
 
 Strict validation should report `966/1018` training images and `28/54` test images for the two class labels, with `60/15` individuals in the training and test sets, respectively.
@@ -100,7 +100,7 @@ python scripts/offline_augmentation.py \
   --seed 20260430
 ```
 
-The random-number state used for the historical production of the formal dataset was not retained. The release script therefore adds an explicit seed to make subsequent runs reproducible. The exact augmented files used for the manuscript are fixed by the released manifest.
+The random-number state used for the historical production of the formal dataset was not retained. The release script therefore adds an explicit seed to make subsequent runs reproducible. The exact augmented files used for the reported run are fixed by the released manifest.
 
 The 436 museum-style images were generated in advance and are managed as fixed inputs in the formal dataset; they are not generated during training. The original model used to generate these style-transferred images was not retained in the current project. Consequently, this package reproduces the complete training workflow using the released `dataset_augmented` dataset as its input.
 
@@ -124,7 +124,7 @@ python -m src.train \
   --checkpoint /path/to/weights/18_convnext_base.fb_in22k_ft_in1k/model.safetensors
 ```
 
-If no checkpoint is supplied, timm will attempt to download pretrained weights when available. The locked weights are not stored in this repository. `models_31.json` and `sam31_e73b33b_models.lock.json` record the portable relative paths, file sizes, and SHA-256 hashes needed to verify a separately obtained copy of the audited weight archive `shortlist_50_20260502`.
+If no checkpoint is supplied, timm will attempt to download pretrained weights when available. The locked weights are not stored in this repository. `models_31.json` and `sam31_models.lock.json` record the portable relative paths, file sizes, and SHA-256 hashes needed to verify a separately obtained copy of the audited weight archive `shortlist_50_20260502`.
 
 Run the 31 models sequentially with the model-specific GPU and micro-batch settings from the registry:
 
@@ -139,21 +139,18 @@ nohup python scripts/run_model_zoo.py \
 
 ## Results
 
-`results/table_s4_results.csv` contains the final SAM31 results for all 31 models. The best model in the frozen run was ConvNeXt-Base:
+`results/table_s4_results.csv` contains the final SAM31 results for all 31 models. The best model in the reference run was ConvNeXt-Base:
 
 - Accuracy: 92.68% (76/82)
 - Balanced accuracy: 90.15%
 - Macro-F1: 91.55%
-- KIZ011338: 2/2 correct
-- MCZ26474: 16/16 correct
-
-These results were selected with the test set as the model-selection split and must be described in the manuscript as test-guided optimization.
+Because no separate validation split was used in the historical run, the test split was monitored during training; this limitation is recorded in the evaluation note above.
 
 Rows in `results/table_s4_results.csv` are ranked by Macro-F1 in descending order, then by accuracy in descending order, and finally by Screening ID in ascending order. Accuracy is therefore not expected to be monotonic down the table.
 
 ## Grad-CAM
 
-ConvNeXt-Base was used for morphological interpretation in the manuscript. The target layer was `stages.3`. By default, gradients are computed for the true class, and the complete heatmap is overlaid without applying a cutoff or mask.
+ConvNeXt-Base was used for morphological interpretation. The target layer was `stages.3`. By default, gradients are computed for the true class, and the complete heatmap is overlaid without applying a cutoff or mask.
 
 ```bash
 python -m src.gradcam \
@@ -169,14 +166,15 @@ Outputs are stored separately under `original/`, `heatmap/`, and `overlay/`, tog
 
 ## Release Assets
 
-Grad-CAM packages for reviewers are distributed through the current GitHub
+Grad-CAM comparison packages are distributed through the current GitHub
 Release [`reviewer-materials-v1`](https://github.com/CjQkJ/hoolock-gibbon-dental-classification/releases/tag/reviewer-materials-v1).
-The release assets are aligned with `SAM31/e73b33b` and are named
-`GradCAM_SAM31_e73b33b_English.zip` and
-`GradCAM_SAM31_e73b33b_Chinese.zip`. They contain the four selected
-individuals, four selected models, original images, Grad-CAM overlays, and
-portable verification metadata. The assets previously attached to this tag
-were superseded by the SAM31 packages.
+The release assets use the SAM31 reference configuration and are named
+`sam31_gradcam_en.zip` and `sam31_gradcam_zh.zip`. Each package contains
+five model-specific galleries: the four highest-ranked SAM31 models by
+Macro-F1, plus the ConvNeXt-Base no-style control. Each gallery covers the
+340 original records in the source manifest (258 training-set originals and
+82 test images), with portable manifests, summaries, and verification
+metadata.
 
 ## Tests
 

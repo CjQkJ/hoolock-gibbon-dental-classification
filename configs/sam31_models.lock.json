@@ -1,7 +1,6 @@
 {
   "schema_version": 2,
-  "protocol_id": "sam31_e73b33b_v1",
-  "canonical_source_commit": "e73b33bf888e26be4833d39d776107b665e08900",
+  "protocol_id": "sam31_reference_v1",
   "weight_archive_id": "shortlist_50_20260502",
   "model_count": 31,
   "models": [

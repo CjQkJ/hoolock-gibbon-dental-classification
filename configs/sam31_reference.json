@@ -1,10 +1,7 @@
 {
   "schema_version": 1,
-  "protocol_id": "sam31_e73b33b_v1",
-  "canonical_candidate": {
-    "short_id": "e73b33b",
-    "commit": "e73b33bf888e26be4833d39d776107b665e08900",
-    "tag": "hoolock-final-e73b33b",
+  "protocol_id": "sam31_reference_v1",
+  "reference_run": {
     "model_id": "convnext_base.fb_in22k_ft_in1k",
     "expected": {
       "correct": 76,
@@ -12,9 +9,7 @@
       "accuracy": 0.926829268292683,
       "balanced_accuracy": 0.9014550264550265,
       "macro_f1": 0.915521978021978,
-      "best_epoch": 23,
-      "KIZ011338": "2/2",
-      "MCZ26474": "16/16"
+      "best_epoch": 23
     }
   },
   "sources": {

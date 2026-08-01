@@ -8,7 +8,7 @@ from pathlib import Path
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="按 SAM31 e73b33b 协议依次运行论文 Table S4 的 31 个模型。")
+    parser = argparse.ArgumentParser(description="按 SAM31 参考配置依次运行 Table S4 的 31 个模型。")
     parser.add_argument("--data-root", required=True)
     parser.add_argument("--models", default="configs/models_31.json")
     parser.add_argument("--config", default="configs/experiment.yaml")

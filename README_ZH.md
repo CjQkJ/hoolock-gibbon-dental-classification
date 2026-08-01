@@ -1,29 +1,29 @@
-# 白眉长臂猿牙齿图像分类：论文复现代码
+# 白眉长臂猿牙齿图像分类：可复现代码
 
-本仓库是面向论文审稿的独立代码包，覆盖数据清单校验、离线增强、按冻结的 SAM31 协议训练和评估 31 个模型、结果汇总，以及 ConvNeXt Grad-CAM。面向审稿人的代码不依赖原服务器路径，数据集、清单和模型权重位置均通过命令行参数传入。
+本仓库是用于复现数据清单校验、离线增强、按照 SAM31 参考配置训练和评估 31 个模型、结果汇总以及 ConvNeXt Grad-CAM 的独立代码包。代码不依赖原服务器路径，数据集、清单和模型权重位置均通过命令行参数传入。
 
 英文说明见 [README.md](README.md)。
 
-## 冻结协议
+## 参考配置
 
-当前 main 分支以冻结协议 `sam31_e73b33b_v1` 为准，规范候选为 `e73b33b`（ConvNeXt-Base，`convnext_base.fb_in22k_ft_in1k`）。
+当前 main 分支记录参考配置 `sam31_reference_v1`，并以 ConvNeXt-Base（`convnext_base.fb_in22k_ft_in1k`）作为主要模型。
 
-- `configs/sam31_e73b33b.json`：规范协议定义。
-- `configs/sam31_e73b33b_models.lock.json`：31 个模型权重完整性和运行例外的可移植锁定文件。
+- `configs/sam31_reference.json`：参考配置定义。
+- `configs/sam31_models.lock.json`：31 个模型权重完整性和运行例外的可移植锁定文件。
 - `configs/models_31.json`：可移植的 31 模型注册表，含相对权重路径和 SHA-256 哈希。
 - `results/table_s4_results.csv`：论文 Table S4 使用的最终 31 模型指标。
 
 完整的发布级协议和复现记录见
 [`docs/SAM31_REPRODUCIBILITY.md`](docs/SAM31_REPRODUCIBILITY.md)。
 
-## 论文实验口径
+## 数据与实验配置
 
 - 二分类标签：`H. hoolock` 与 `H. leuconedys group`；测试集中的 `H. tianxing` 并入后者。
 - 清理后原始数据：75 个体、340 张图片。
 - 训练原图：258 张、60 个体。
 - 最终训练集：1984 张，包括 258 张原图、436 张博物馆风格化图像和 1290 张离线增强图像。
 - 测试集：82 张原图、15 个体；个体不跨训练集和测试集。
-- 在线增强：直接正方形缩放至各模型原生输入尺寸、水平翻转 `p=0.5`、5 度旋转 `p=0.5`、亮度抖动 `0.1`。冻结协议不使用 `RandomResizedCrop`。
+- 在线增强：直接正方形缩放至各模型原生输入尺寸、水平翻转 `p=0.5`、5 度旋转 `p=0.5`、亮度抖动 `0.1`。参考配置不使用 `RandomResizedCrop`。
 - 优化：AdamW，初始学习率 `3e-4`，权重衰减 `0.01`，余弦退火，最多 200 epoch，早停 patience 30。
 - SAM：非自适应 SAM，`rho=0.05`，参数精确恢复，对所有可训练梯度计算全局 L2 范数。
 - 损失：按训练类别频数倒数加权的交叉熵。
@@ -84,7 +84,7 @@ dataset_augmented/
 python scripts/build_manifest.py \
   --data-root /path/to/dataset_augmented \
   --output metadata/dataset_manifest.csv \
-  --strict-paper-counts
+  --strict-expected-counts
 ```
 
 严格校验应输出训练 `966/1018`、测试 `28/54`，训练/测试个体分别为 `60/15`。
@@ -100,7 +100,7 @@ python scripts/offline_augmentation.py \
   --seed 20260430
 ```
 
-历史正式数据生成时没有保存离线增强的随机数状态；发布脚本增加了显式 seed 以保证后续运行可复现。论文使用的确切增强文件由发布 manifest 固定。
+历史正式数据生成时没有保存离线增强的随机数状态；发布脚本增加了显式 seed 以保证后续运行可复现。报告结果使用的确切增强文件由发布 manifest 固定。
 
 436 张博物馆风格化图像是预先生成并随正式数据集管理的固定输入，不在训练时生成。当前项目中没有保存其原始风格化生成模型，因此本包复现的是以发布版 `dataset_augmented` 为输入的完整训练流程。
 
@@ -124,7 +124,7 @@ python -m src.train \
   --checkpoint /path/to/weights/18_convnext_base.fb_in22k_ft_in1k/model.safetensors
 ```
 
-未传 checkpoint 时，timm 会在可用时尝试下载预训练权重。锁定权重不存储在本仓库中；`models_31.json` 和 `sam31_e73b33b_models.lock.json` 记录相对路径、文件大小和 SHA-256，可用于核验另行取得的审计权重归档 `shortlist_50_20260502`。
+未传 checkpoint 时，timm 会在可用时尝试下载预训练权重。锁定权重不存储在本仓库中；`models_31.json` 和 `sam31_models.lock.json` 记录相对路径、文件大小和 SHA-256，可用于核验另行取得的审计权重归档 `shortlist_50_20260502`。
 
 使用注册表里的模型专用 GPU 和 micro-batch 设置依次运行 31 个模型：
 
@@ -139,21 +139,18 @@ nohup python scripts/run_model_zoo.py \
 
 ## 结果
 
-`results/table_s4_results.csv` 包含全部 31 个模型的最终 SAM31 结果。冻结运行中的最优模型为 ConvNeXt-Base：
+`results/table_s4_results.csv` 包含全部 31 个模型的最终 SAM31 结果。参考运行中的最优模型为 ConvNeXt-Base：
 
 - Accuracy：92.68%（76/82）
 - Balanced accuracy：90.15%
 - Macro-F1：91.55%
-- KIZ011338：2/2 正确
-- MCZ26474：16/16 正确
-
-这些结果以测试集作为模型选择划分，论文中应明确描述为 test-guided optimization。
+由于历史运行没有单独的验证集，训练期间监测了测试划分；这一限制已在上面的评估说明中记录。
 
 `results/table_s4_results.csv` 按 Macro-F1 降序排列；Macro-F1 相同则按 Accuracy 降序排列，仍相同则按 Screening ID 升序排列。因此，表中 Accuracy 不一定从上至下单调下降。
 
 ## Grad-CAM
 
-论文选用 ConvNeXt-Base 进行形态解释。目标层为 `stages.3`，默认对真实类别求梯度，使用完整热力图覆盖，不设置 cutoff 或 mask。
+研究使用 ConvNeXt-Base 进行形态解释。目标层为 `stages.3`，默认对真实类别求梯度，使用完整热力图覆盖，不设置 cutoff 或 mask。
 
 ```bash
 python -m src.gradcam \
@@ -169,13 +166,13 @@ python -m src.gradcam \
 
 ## Release 材料
 
-Grad-CAM 审稿材料通过当前的 GitHub
+Grad-CAM 对比材料通过当前的 GitHub
 Release [`reviewer-materials-v1`](https://github.com/CjQkJ/hoolock-gibbon-dental-classification/releases/tag/reviewer-materials-v1)
-发布。该 Release 的附件与 `SAM31/e73b33b` 一致，文件名为
-`GradCAM_SAM31_e73b33b_English.zip` 和
-`GradCAM_SAM31_e73b33b_Chinese.zip`，包含 4 个选定个体、4 个选定模型、
-原图、Grad-CAM 热力图以及可移植的核验元数据。此前附在该 tag 下的旧材料已由
-SAM31 版本替换。
+发布。该 Release 的附件采用 SAM31 参考配置，文件名为
+`sam31_gradcam_en.zip` 和 `sam31_gradcam_zh.zip`。每个压缩包包含
+5 个模型画廊：SAM31 中按 Macro-F1 排列的前 4 个模型，以及 ConvNeXt-Base
+无风格化对照。每个画廊覆盖源 manifest 中的 340 条原始记录（训练集原图 258
+张、测试图 82 张），并包含可移植的 manifest、汇总和核验元数据。
 
 ## 测试
 
