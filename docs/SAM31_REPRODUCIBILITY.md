@@ -107,5 +107,14 @@ python scripts/run_model_zoo.py \
   --continue-on-error
 ```
 
-The historical GitHub release `reviewer-materials-v1` predates this frozen
-SAM31 protocol and is not a reproduction artifact for the current branch.
+## Reviewer Grad-CAM Release
+
+The reviewer-facing Grad-CAM materials are distributed through the GitHub
+Release [`reviewer-materials-v1`](https://github.com/CjQkJ/hoolock-gibbon-dental-classification/releases/tag/reviewer-materials-v1).
+The current assets are `GradCAM_SAM31_e73b33b_English.zip` and
+`GradCAM_SAM31_e73b33b_Chinese.zip`. They contain 33 original images and 132
+Grad-CAM overlays for four selected models and four selected individuals,
+together with portable metadata and SHA-256 checksums. The package records
+the true-class target, full heatmap overlay, model-specific target layers,
+and the absence of cutoff, masking, test-time augmentation, calibration,
+threshold tuning, and ensembling.

@@ -169,7 +169,14 @@ Outputs are stored separately under `original/`, `heatmap/`, and `overlay/`, tog
 
 ## Release Assets
 
-Grad-CAM packages for reviewers are distributed through GitHub Releases. The `reviewer-materials-v1` tag predates the SAM31 protocol and is retained only as a historical release; it must not be used to reproduce the current main branch.
+Grad-CAM packages for reviewers are distributed through the current GitHub
+Release [`reviewer-materials-v1`](https://github.com/CjQkJ/hoolock-gibbon-dental-classification/releases/tag/reviewer-materials-v1).
+The release assets are aligned with `SAM31/e73b33b` and are named
+`GradCAM_SAM31_e73b33b_English.zip` and
+`GradCAM_SAM31_e73b33b_Chinese.zip`. They contain the four selected
+individuals, four selected models, original images, Grad-CAM overlays, and
+portable verification metadata. The assets previously attached to this tag
+were superseded by the SAM31 packages.
 
 ## Tests
 

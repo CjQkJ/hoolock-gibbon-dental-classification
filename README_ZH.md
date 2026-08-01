@@ -169,7 +169,13 @@ python -m src.gradcam \
 
 ## Release 材料
 
-Grad-CAM 审稿材料通过 GitHub Releases 发布。`reviewer-materials-v1` 早于 SAM31 协议，仅保留为历史 release，不能用于复现当前 main 分支。
+Grad-CAM 审稿材料通过当前的 GitHub
+Release [`reviewer-materials-v1`](https://github.com/CjQkJ/hoolock-gibbon-dental-classification/releases/tag/reviewer-materials-v1)
+发布。该 Release 的附件与 `SAM31/e73b33b` 一致，文件名为
+`GradCAM_SAM31_e73b33b_English.zip` 和
+`GradCAM_SAM31_e73b33b_Chinese.zip`，包含 4 个选定个体、4 个选定模型、
+原图、Grad-CAM 热力图以及可移植的核验元数据。此前附在该 tag 下的旧材料已由
+SAM31 版本替换。
 
 ## 测试
 
