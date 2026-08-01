@@ -18,13 +18,12 @@
     }
   },
   "sources": {
-    "manuscript_models": "reviewer_code_release/configs/models_31.json",
-    "model_zoo": "configs/model_zoo_shortlist_50.json",
-    "weights_root": "/home/chenqingjian/four_test/Hoolock/model/shortlist_50_20260502"
+    "model_registry": "configs/models_31.json",
+    "weight_archive_id": "shortlist_50_20260502"
   },
   "dataset": {
-    "root": "/home/chenqingjian/four_test/Hoolock/dataset_augmented",
-    "manifest": "metadata/supervised_hoolock_dataset_augmented_14_safe/split_manifest.csv",
+    "dataset_id": "dataset_augmented",
+    "manifest": "metadata/dataset_manifest.csv",
     "expected_train_images": 1984,
     "expected_test_images": 82,
     "expected_train_class_counts": {
@@ -133,8 +132,9 @@
       "reason": "documented MobileNetV5-300M memory exception"
     },
     "37": {
+      "initial_physical_microbatch": 8,
       "initial_gpu_count": 2,
-      "reason": "existing model manifest recommends two GPUs"
+      "reason": "audited two-GPU run used physical micro-batch 8"
     }
   }
 }

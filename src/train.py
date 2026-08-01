@@ -4,7 +4,6 @@ import argparse
 import csv
 import json
 import random
-from collections import Counter
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -30,6 +29,15 @@ def seed_everything(seed: int) -> None:
     torch.manual_seed(seed)
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.benchmark = False
+    torch.backends.cudnn.deterministic = True
+
+
+def seed_worker(_worker_id: int) -> None:
+    """Seed Python and NumPy in each DataLoader worker from PyTorch's worker seed."""
+    worker_seed = torch.initial_seed() % (2**32)
+    np.random.seed(worker_seed)
+    random.seed(worker_seed)
 
 
 def load_yaml(path: str | Path) -> dict[str, Any]:
@@ -115,7 +123,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--checkpoint", default=None, help="Load a local model weight or checkpoint for evaluation or training.")
     parser.add_argument("--physical-microbatch", type=int, default=None)
     parser.add_argument("--gpu-count", type=int, default=None)
-    parser.add_argument("--num-workers", type=int, default=4)
+    parser.add_argument("--num-workers", type=int, default=None)
     parser.add_argument("--device", default="cuda")
     parser.add_argument("--data-parallel", action="store_true")
     parser.add_argument("--no-pretrained", action="store_true", help="Do not download pretrained weights; useful for structural validation.")
@@ -132,14 +140,29 @@ def main() -> None:
     seed_everything(seed)
 
     manifest = Path(args.manifest or config["data"]["manifest"])
-    mean = tuple(float(value) for value in config["data"]["imagenet_mean"])
-    std = tuple(float(value) for value in config["data"]["imagenet_std"])
+    mean = tuple(float(value) for value in model_config["mean"])
+    std = tuple(float(value) for value in model_config["std"])
     image_size = int(model_config["input_size"])
     train_transform, test_transform = build_transforms(image_size, mean, std)
     train_dataset = ManifestDataset(manifest, args.data_root, "train", train_transform)
     test_dataset = ManifestDataset(manifest, args.data_root, "test", test_transform)
 
-    device = torch.device(args.device if torch.cuda.is_available() else "cpu")
+    expected_train = int(config["data"]["train_samples"])
+    expected_test = int(config["data"]["test_samples"])
+    if len(train_dataset) != expected_train or len(test_dataset) != expected_test:
+        raise ValueError(
+            "Dataset counts do not match the frozen protocol: "
+            f"train={len(train_dataset)}/{expected_train}, "
+            f"test={len(test_dataset)}/{expected_test}"
+        )
+
+    requested_device = torch.device(args.device)
+    if requested_device.type == "cuda" and not torch.cuda.is_available():
+        if args.dry_run:
+            requested_device = torch.device("cpu")
+        else:
+            raise RuntimeError("The requested CUDA device is unavailable")
+    device = requested_device
     model = build_model(
         model_config,
         checkpoint=args.checkpoint,
@@ -151,8 +174,15 @@ def main() -> None:
         or model_config.get("initial_gpu_count")
         or model_config.get("recommended_gpus", 1)
     )
+    if requested_gpus > 1 and device.type != "cuda":
+        raise RuntimeError("A multi-GPU protocol run requires a CUDA device")
     use_data_parallel = args.data_parallel or requested_gpus > 1
-    if use_data_parallel and device.type == "cuda" and torch.cuda.device_count() >= requested_gpus:
+    if use_data_parallel and device.type == "cuda":
+        available_gpus = torch.cuda.device_count()
+        if available_gpus < requested_gpus:
+            raise RuntimeError(
+                f"Requested {requested_gpus} GPUs but only {available_gpus} are available"
+            )
         model = nn.DataParallel(model, device_ids=list(range(requested_gpus)))
 
     logical_batch = int(training.get("logical_batch_size", training["batch_size"]))
@@ -165,14 +195,21 @@ def main() -> None:
         raise ValueError(
             f"physical_microbatch must be in [1, {logical_batch}], got {physical_microbatch}"
         )
+    num_workers = int(
+        args.num_workers if args.num_workers is not None else training.get("num_workers", 4)
+    )
+    if num_workers < 0:
+        raise ValueError(f"num_workers must be non-negative, got {num_workers}")
 
     effective = {
         "protocol_id": config.get("protocol_id"),
         "model": model_config,
+        "normalization": {"mean": list(mean), "std": list(std)},
         "training": training,
         "logical_batch_size": logical_batch,
         "physical_microbatch": physical_microbatch,
         "gpu_count": requested_gpus,
+        "num_workers": num_workers,
         "train_samples": len(train_dataset),
         "test_samples": len(test_dataset),
         "train_class_counts": dict(train_dataset.class_counts()),
@@ -192,18 +229,20 @@ def main() -> None:
         train_dataset,
         batch_size=logical_batch,
         shuffle=True,
-        num_workers=args.num_workers,
+        num_workers=num_workers,
         pin_memory=device.type == "cuda",
         collate_fn=collate_batch,
         generator=generator,
+        worker_init_fn=seed_worker,
     )
     test_loader = DataLoader(
         test_dataset,
-        batch_size=logical_batch,
+        batch_size=physical_microbatch,
         shuffle=False,
-        num_workers=args.num_workers,
+        num_workers=num_workers,
         pin_memory=device.type == "cuda",
         collate_fn=collate_batch,
+        worker_init_fn=seed_worker,
     )
 
     run_dir = Path(args.output_root) / f"{datetime.now():%Y%m%d_%H%M%S}_{args.model_key}"

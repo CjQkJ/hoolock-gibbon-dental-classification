@@ -9,9 +9,12 @@ For the Chinese documentation, see [README_ZH.md](README_ZH.md).
 The current main branch is aligned with the frozen protocol `sam31_e73b33b_v1`, whose canonical candidate is `e73b33b` (ConvNeXt-Base, `convnext_base.fb_in22k_ft_in1k`).
 
 - `configs/sam31_e73b33b.json`: canonical protocol definition.
-- `configs/sam31_e73b33b_models.lock.json`: server-side audit lock for the 31 model weights and run-time exceptions.
+- `configs/sam31_e73b33b_models.lock.json`: portable integrity lock for the 31 model weights and run-time exceptions.
 - `configs/models_31.json`: portable 31-model registry with relative weight paths and SHA-256 hashes.
 - `results/table_s4_results.csv`: final 31-model metrics reported in Table S4.
+
+The complete release-level protocol and reproducibility record is provided in
+[`docs/SAM31_REPRODUCIBILITY.md`](docs/SAM31_REPRODUCIBILITY.md).
 
 ## Experimental Scope of the Manuscript
 
@@ -31,7 +34,7 @@ The logical batch size is 16. The default physical micro-batch size is 16. The a
 
 - EfficientNet-B7: input size 600, physical micro-batch 4, logical batch remains 16.
 - MobileNetV5-300M: frozen backbone, physical micro-batch 4, only the classification head is trained.
-- SwinV2-Large: two GPUs with DataParallel.
+- SwinV2-Large: physical micro-batch 8 on two GPUs with DataParallel.
 
 ## Important Evaluation Note
 
@@ -121,7 +124,7 @@ python -m src.train \
   --checkpoint /path/to/weights/18_convnext_base.fb_in22k_ft_in1k/model.safetensors
 ```
 
-If no checkpoint is supplied, timm will attempt to download pretrained weights when available. The locked weights are not stored in this repository; `models_31.json` records their relative paths and SHA-256 hashes, and `sam31_e73b33b_models.lock.json` records the audited server-side absolute paths.
+If no checkpoint is supplied, timm will attempt to download pretrained weights when available. The locked weights are not stored in this repository. `models_31.json` and `sam31_e73b33b_models.lock.json` record the portable relative paths, file sizes, and SHA-256 hashes needed to verify a separately obtained copy of the audited weight archive `shortlist_50_20260502`.
 
 Run the 31 models sequentially with the model-specific GPU and micro-batch settings from the registry:
 
@@ -146,6 +149,8 @@ nohup python scripts/run_model_zoo.py \
 
 These results were selected with the test set as the model-selection split and must be described in the manuscript as test-guided optimization.
 
+Rows in `results/table_s4_results.csv` are ranked by Macro-F1 in descending order, then by accuracy in descending order, and finally by Screening ID in ascending order. Accuracy is therefore not expected to be monotonic down the table.
+
 ## Grad-CAM
 
 ConvNeXt-Base was used for morphological interpretation in the manuscript. The target layer was `stages.3`. By default, gradients are computed for the true class, and the complete heatmap is overlaid without applying a cutoff or mask.
@@ -164,7 +169,7 @@ Outputs are stored separately under `original/`, `heatmap/`, and `overlay/`, tog
 
 ## Release Assets
 
-Grad-CAM packages for reviewers are distributed through GitHub Releases. The `reviewer-materials-v1` tag was published before the SAM31 protocol update and does not correspond to the current main branch; Grad-CAM materials for the SAM31 protocol should be distributed under a release published after this update.
+Grad-CAM packages for reviewers are distributed through GitHub Releases. The `reviewer-materials-v1` tag predates the SAM31 protocol and is retained only as a historical release; it must not be used to reproduce the current main branch.
 
 ## Tests
 

@@ -24,6 +24,11 @@ def test_sam31_protocol_json_declares_frozen_pipeline():
     assert training["augmentation"]["horizontal_flip_probability"] == 0.5
     assert protocol["test_contract"]["tta"] is False
     assert protocol["test_contract"]["decision_rule"] == "argmax"
+    assert protocol["sources"]["model_registry"] == "configs/models_31.json"
+    assert protocol["sources"]["weight_archive_id"] == "shortlist_50_20260502"
+    assert protocol["dataset"]["dataset_id"] == "dataset_augmented"
+    assert protocol["dataset"]["manifest"] == "metadata/dataset_manifest.csv"
+    assert protocol["model_overrides"]["37"]["initial_physical_microbatch"] == 8
 
 
 def test_experiment_yaml_uses_sam31_pipeline():
@@ -33,6 +38,7 @@ def test_experiment_yaml_uses_sam31_pipeline():
     assert config["online_augmentation"]["resize"] == "direct_square"
     assert config["training"]["sam"]["adaptive"] is False
     assert config["training"]["selection_split"] == "test"
+    assert config["training"]["num_workers"] == 4
 
 
 def test_models_31_matches_lock_and_expected_screening_ids():
@@ -45,11 +51,21 @@ def test_models_31_matches_lock_and_expected_screening_ids():
     model_ids = {row["screening_id"] for row in models}
     assert model_ids == set(protocol["expected_screening_ids"])
     assert model_ids == {row["screening_id"] for row in lock["models"]}
+    assert lock["schema_version"] == 2
+    assert lock["weight_archive_id"] == "shortlist_50_20260502"
     for lock_row in lock["models"]:
         released_row = next(row for row in models if row["screening_id"] == lock_row["screening_id"])
-        resolved = (Path(lock["weights_root"]) / released_row["weight_relative_path"]).as_posix()
-        assert resolved == lock_row["weight_path"]
+        assert released_row["weight_relative_path"] == lock_row["weight_relative_path"]
         assert released_row["weight_sha256"] == lock_row["weight_sha256"]
+
+    swinv2 = next(row for row in models if row["screening_id"] == 37)
+    assert swinv2["initial_physical_microbatch"] == 8
+    assert swinv2["initial_gpu_count"] == 2
+
+    for row in models:
+        assert len(row["mean"]) == 3
+        assert len(row["std"]) == 3
+        assert not Path(row["weight_relative_path"]).is_absolute()
 
 
 def test_table_s4_reports_sam31_convnext_top_results():
@@ -65,3 +81,9 @@ def test_table_s4_reports_sam31_convnext_top_results():
     assert top["KIZ011338 n"] == "2"
     assert top["MCZ26474 correct"] == "16"
     assert top["MCZ26474 n"] == "16"
+
+    observed_order = [
+        (-float(row["Macro-F1 (%)"]), -float(row["Accuracy (%)"]), int(row["Screening ID"]))
+        for row in rows
+    ]
+    assert observed_order == sorted(observed_order)

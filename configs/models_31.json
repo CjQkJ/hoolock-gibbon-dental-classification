@@ -751,7 +751,7 @@
         "head.fc"
       ],
       "freeze_backbone": false,
-      "initial_physical_microbatch": 16,
+      "initial_physical_microbatch": 8,
       "initial_gpu_count": 2,
       "weight_relative_path": "37_swinv2_large_window12to24_192to384.ms_in22k_ft_in1k/model.safetensors",
       "weight_sha256": "204631b53b5d8e2a4382403673e15938caa59b052fbb6472ac428355a39f7545"

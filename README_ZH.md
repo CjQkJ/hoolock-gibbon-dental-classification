@@ -9,9 +9,12 @@
 当前 main 分支以冻结协议 `sam31_e73b33b_v1` 为准，规范候选为 `e73b33b`（ConvNeXt-Base，`convnext_base.fb_in22k_ft_in1k`）。
 
 - `configs/sam31_e73b33b.json`：规范协议定义。
-- `configs/sam31_e73b33b_models.lock.json`：服务器端 31 个模型权重和运行例外的审计锁定文件。
+- `configs/sam31_e73b33b_models.lock.json`：31 个模型权重完整性和运行例外的可移植锁定文件。
 - `configs/models_31.json`：可移植的 31 模型注册表，含相对权重路径和 SHA-256 哈希。
 - `results/table_s4_results.csv`：论文 Table S4 使用的最终 31 模型指标。
+
+完整的发布级协议和复现记录见
+[`docs/SAM31_REPRODUCIBILITY.md`](docs/SAM31_REPRODUCIBILITY.md)。
 
 ## 论文实验口径
 
@@ -31,7 +34,7 @@
 
 - EfficientNet-B7：输入 600，物理 micro-batch 4，逻辑 batch 仍为 16。
 - MobileNetV5-300M：冻结 backbone，物理 micro-batch 4，仅训练分类头。
-- SwinV2-Large：两卡 DataParallel。
+- SwinV2-Large：物理 micro-batch 8、两卡 DataParallel。
 
 ## 重要评估说明
 
@@ -121,7 +124,7 @@ python -m src.train \
   --checkpoint /path/to/weights/18_convnext_base.fb_in22k_ft_in1k/model.safetensors
 ```
 
-未传 checkpoint 时，timm 会在可用时尝试下载预训练权重。锁定权重不存储在本仓库中；`models_31.json` 记录其相对路径和 SHA-256，`sam31_e73b33b_models.lock.json` 记录服务器端审计绝对路径。
+未传 checkpoint 时，timm 会在可用时尝试下载预训练权重。锁定权重不存储在本仓库中；`models_31.json` 和 `sam31_e73b33b_models.lock.json` 记录相对路径、文件大小和 SHA-256，可用于核验另行取得的审计权重归档 `shortlist_50_20260502`。
 
 使用注册表里的模型专用 GPU 和 micro-batch 设置依次运行 31 个模型：
 
@@ -146,6 +149,8 @@ nohup python scripts/run_model_zoo.py \
 
 这些结果以测试集作为模型选择划分，论文中应明确描述为 test-guided optimization。
 
+`results/table_s4_results.csv` 按 Macro-F1 降序排列；Macro-F1 相同则按 Accuracy 降序排列，仍相同则按 Screening ID 升序排列。因此，表中 Accuracy 不一定从上至下单调下降。
+
 ## Grad-CAM
 
 论文选用 ConvNeXt-Base 进行形态解释。目标层为 `stages.3`，默认对真实类别求梯度，使用完整热力图覆盖，不设置 cutoff 或 mask。
@@ -164,7 +169,7 @@ python -m src.gradcam \
 
 ## Release 材料
 
-Grad-CAM 审稿材料通过 GitHub Releases 发布。`reviewer-materials-v1` 标签发布于 SAM31 协议更新之前，不代表当前 main 分支；分发 SAM31 协议的 Grad-CAM 材料时应使用本次更新之后发布的 release。
+Grad-CAM 审稿材料通过 GitHub Releases 发布。`reviewer-materials-v1` 早于 SAM31 协议，仅保留为历史 release，不能用于复现当前 main 分支。
 
 ## 测试
 

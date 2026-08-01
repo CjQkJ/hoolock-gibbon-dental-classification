@@ -1,5 +1,6 @@
 import csv
 import json
+import re
 from collections import Counter
 from pathlib import Path
 
@@ -39,4 +40,29 @@ def test_model_release_contains_31_unique_models():
     assert len(models) == 31
     assert len({row["key"] for row in models}) == 31
     assert len({row["rank"] for row in models}) == 31
+
+
+def test_public_release_metadata_is_portable():
+    files = [
+        ROOT / "configs/sam31_e73b33b.json",
+        ROOT / "configs/sam31_e73b33b_models.lock.json",
+        ROOT / "configs/models_31.json",
+        ROOT / "results/table_s4_results.csv",
+    ]
+    for path in files:
+        text = path.read_text(encoding="utf-8")
+        assert "/home/" not in text
+        assert not re.search(r"[A-Za-z]:[\\/]", text)
+
+    protocol = json.loads(files[0].read_text(encoding="utf-8"))
+    lock = json.loads(files[1].read_text(encoding="utf-8"))
+    assert protocol["sources"]["weight_archive_id"] == "shortlist_50_20260502"
+    assert protocol["dataset"]["dataset_id"] == "dataset_augmented"
+    assert "weights_root" not in protocol["sources"]
+    assert "weights_root" not in lock
+
+    for row in lock["models"]:
+        relative_path = Path(row["weight_relative_path"])
+        assert not relative_path.is_absolute()
+        assert ".." not in relative_path.parts
 

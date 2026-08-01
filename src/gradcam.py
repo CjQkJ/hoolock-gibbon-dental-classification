@@ -94,8 +94,8 @@ def main() -> None:
     config = yaml.safe_load(Path(args.config).read_text(encoding="utf-8"))
     models = json.loads(Path(args.models).read_text(encoding="utf-8"))["models"]
     model_config = next(row for row in models if row["key"] == args.model_key)
-    mean = tuple(config["data"]["imagenet_mean"])
-    std = tuple(config["data"]["imagenet_std"])
+    mean = tuple(float(value) for value in model_config["mean"])
+    std = tuple(float(value) for value in model_config["std"])
     _, transform = build_transforms(int(model_config["input_size"]), mean, std)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = build_model(model_config, checkpoint=args.checkpoint, pretrained=False).to(device).eval()

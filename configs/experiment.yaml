@@ -34,6 +34,7 @@ training:
   batch_size: 16
   logical_batch_size: 16
   default_physical_microbatch: 16
+  num_workers: 4
   gradient_accumulation_steps: 1
   optimizer: adamw
   learning_rate: 0.0003
