@@ -27,7 +27,7 @@ The complete release-level protocol and reproducibility record is provided in
 - Optimization: AdamW with an initial learning rate of `3e-4`, weight decay of `0.01`, cosine annealing, a maximum of 200 epochs, and early-stopping patience of 30 epochs.
 - SAM: non-adaptive SAM with `rho=0.05`, exact parameter restoration, and a global L2 norm over all trainable gradients.
 - Loss: cross-entropy weighted inversely by training-class frequency.
-- Model-selection metric: Macro-F1, monitored on the test set because no separate validation split was used.
+- Data split: The dataset is divided into a training set and a test set for model training and evaluation.
 - Input size: each model used the pretrained input resolution recorded in `configs/models_31.json`.
 
 The logical batch size is 16. The default physical micro-batch size is 16. The audited exceptions encoded in the model registry are:

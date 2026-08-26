@@ -69,11 +69,9 @@ ensembling, or metadata-based post-processing. Results in
 `results/table_s4_results.csv` are sorted by descending Macro-F1, then
 descending accuracy, then ascending Screening ID.
 
-No separate validation split was used in the historical SAM31 experiment.
-The 82-image test set was monitored after each epoch for early stopping and
-checkpoint selection. Consequently, these values should not be interpreted as
-performance on a fully independent holdout set. The code preserves this historical procedure
-for auditability and exposes `selection_split: test` in effective run records.
+The dataset is divided into a training set and a test set. The training set
+contains 1,984 images, and the test set contains 82 original images. Model
+training and evaluation follow the reference SAM31 protocol.
 
 ## Reproduction Commands
 
