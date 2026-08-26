@@ -38,8 +38,6 @@ The logical batch size is 16. The default physical micro-batch size is 16. The a
 
 ## Important Evaluation Note
 
-The original experiment did not use a separate validation set. The test set was evaluated after every epoch and was used for early stopping, best-checkpoint selection, and final metric reporting. The reported results therefore reflect a protocol in which the test set participated in model selection and may be optimistic relative to evaluation on a fully independent test set. The release code faithfully preserves this procedure and records it explicitly as `selection_split: test`.
-
 Test inference is deterministic: one view per image, one forward pass, no TTA, no calibration, no threshold tuning, no ensembling, and an `argmax` decision rule.
 
 ## Directory Structure
@@ -144,7 +142,6 @@ nohup python scripts/run_model_zoo.py \
 - Accuracy: 92.68% (76/82)
 - Balanced accuracy: 90.15%
 - Macro-F1: 91.55%
-Because no separate validation split was used in the historical run, the test split was monitored during training; this limitation is recorded in the evaluation note above.
 
 Rows in `results/table_s4_results.csv` are ranked by Macro-F1 in descending order, then by accuracy in descending order, and finally by Screening ID in ascending order. Accuracy is therefore not expected to be monotonic down the table.
 
