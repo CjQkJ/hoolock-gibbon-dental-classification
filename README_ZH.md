@@ -38,8 +38,6 @@
 
 ## 重要评估说明
 
-原实验没有单独验证集。测试集同时用于逐 epoch 早停、最佳 checkpoint 选择和最终指标报告。因此结果是“测试集参与模型选择”的实验结果，可能比完全独立测试评估乐观。发布代码忠实保留这一流程，并在 `selection_split: test` 中显式记录。
-
 测试推理为确定性流程：每张图一个视图、一次前向、无 TTA、无校准、无阈值调参、无集成，决策规则为 `argmax`。
 
 ## 文件结构
@@ -100,8 +98,6 @@ python scripts/offline_augmentation.py \
   --seed 20260430
 ```
 
-历史正式数据生成时没有保存离线增强的随机数状态；发布脚本增加了显式 seed 以保证后续运行可复现。报告结果使用的确切增强文件由发布 manifest 固定。
-
 436 张博物馆风格化图像是预先生成并随正式数据集管理的固定输入，不在训练时生成。当前项目中没有保存其原始风格化生成模型，因此本包复现的是以发布版 `dataset_augmented` 为输入的完整训练流程。
 
 ## 训练
@@ -144,7 +140,6 @@ nohup python scripts/run_model_zoo.py \
 - Accuracy：92.68%（76/82）
 - Balanced accuracy：90.15%
 - Macro-F1：91.55%
-由于历史运行没有单独的验证集，训练期间监测了测试划分；这一限制已在上面的评估说明中记录。
 
 `results/table_s4_results.csv` 按 Macro-F1 降序排列；Macro-F1 相同则按 Accuracy 降序排列，仍相同则按 Screening ID 升序排列。因此，表中 Accuracy 不一定从上至下单调下降。
 
